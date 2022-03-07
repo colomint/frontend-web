@@ -23,16 +23,11 @@ export default function ExampleUI({
       {/*
         ⚙️ Here is an example UI that displays and sets the purpose in your smart contract:
       */}
-      <div style={{ border: "1px solid #cccccc", padding: 16, width: 400, margin: "auto", marginTop: 64 }}>
-        <h2>Example UI:</h2>
-        <h4>purpose: {purpose}</h4>
-        <Divider />
+      <div style={{ border: "1px solid #cccccc", padding: 16, width: 700, margin: "auto", marginTop: 64, backgroundBlendMode:"gradient", background:'url("Backgroud.jpeg")',backgroundRepeat:"no-repeat", backgroundSize:"contain",opacity:0.6  }}>
+        <div style={{ color: "White", fontSize: "60px"}}>Welcome to ColoMint</div>
+        <div style={{ color: "White", fontSize: "36px"}}>A JackPot that will always have a winner</div>
+        <h4 style={{ color: "White", fontSize: "64px"}}>MinT it 2 Win iT</h4>
         <div style={{ margin: 8 }}>
-          <Input
-            onChange={e => {
-              setNewPurpose(e.target.value);
-            }}
-          />
           <Button
             style={{ marginTop: 8 }}
             onClick={async () => {
@@ -57,7 +52,7 @@ export default function ExampleUI({
               console.log(await result);
             }}
           >
-            Set Purpose!
+            Connect Your Wallet
           </Button>
         </div>
         <Divider />

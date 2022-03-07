@@ -5,11 +5,11 @@ import React from "react";
 
 export default function Header() {
   return (
-    <a href="https://github.com/austintgriffith/scaffold-eth" target="_blank" rel="noopener noreferrer">
+    <a href="https://github.com/colomint/frontend-web" target="_blank" rel="noopener noreferrer">
       <PageHeader
         title="🏗 ColoMint"
-        subTitle="forkable Ethereum dev stack focused on fast product iteration"
-        style={{ cursor: "pointer" }}
+        subTitle="Every Jackpot has a winner"
+        style={{ backgroundImage:'url("Backgroud.jpeg")' }}
       />
     </a>
   );
