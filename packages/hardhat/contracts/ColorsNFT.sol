@@ -30,6 +30,8 @@ contract ColorsNFT is ERC721, ERC1155Holder, Ownable {
 
     // ERC1155 mapping (how much of each color modifier it has)
 
+    address colorModifiersAddress;
+
     mapping(uint256 => mapping(uint256 => uint256))
         private supplyAmountsForColor;
 
@@ -38,8 +40,12 @@ contract ColorsNFT is ERC721, ERC1155Holder, Ownable {
 
     //Constructor and functions
 
-    constructor() payable ERC721("Colomint", "COLO") {
+    constructor(address _colorModifiersAddress)
+        payable
+        ERC721("Colomint", "COLO")
+    {
         maxSupply = 10 * 16;
+        colorModifiersAddress = _colorModifiersAddress;
     }
 
     function toggleIsMintenabled() external onlyOwner {
@@ -97,6 +103,10 @@ contract ColorsNFT is ERC721, ERC1155Holder, Ownable {
         uint256 value,
         bytes calldata data
     ) public override returns (bytes4) {
+        require(
+            msg.sender == colorModifiersAddress,
+            "Only works with accepted ERC1155"
+        );
         uint256 colorNFTId = toUint256(data); // check this
         supplyAmountsForColor[colorNFTId][id] += value;
 

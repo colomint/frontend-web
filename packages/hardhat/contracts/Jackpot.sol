@@ -60,7 +60,7 @@ contract Jackpot is VRFConsumerBase, Ownable {
         colorsNFT = new ColorsNFT();
         colorsNFTAddress = address(colorsNFT);
         lottery_state = LOTTERY_STATE.OPEN;
-        // startLottery() could be here or not depending of definition I would say not tbd
+        // startLottery() could be here or not depending of definition I would say not tbd startLottery function should be changed to onlySelf then
     }
 
     // Owner functions to start restart Lottery
@@ -82,11 +82,10 @@ contract Jackpot is VRFConsumerBase, Ownable {
         colorModifiers = new ColorModifiers();
         colorModifiersAddress = address(colorModifiers);
 
-        //TD need to define a way that colorsNFT only accepts the ERC1155 tokens from colorModifiersAddress
-        colorsNFT = new ColorsNFT();
+        colorsNFT = new ColorsNFT(colorModifiersAddress);
         colorsNFTAddress = address(colorsNFT);
         lottery_state = LOTTERY_STATE.OPEN;
-        startLottery(); // I think start lottery here is ok instead of waiting owner to do it again .. tbd)
+        startLottery(); // If it is used here startLottery should be onlySelf instead of onlyOwner , or maybe we can do a modifier that works with onlyowner and onlyself at the same time
     }
 
     function getBalance() public returns (uint256) {
