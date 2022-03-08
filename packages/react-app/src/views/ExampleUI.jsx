@@ -52,7 +52,7 @@ export default function ExampleUI({
               console.log(await result);
             }}
           >
-            Connect Your Wallet
+            Connect Your Wallet !
           </Button>
         </div>
         <Divider />
