@@ -8,15 +8,17 @@ import "@chainlink/contracts/src/v0.8/VRFConsumerBase.sol";
 import "./ColorsNFT.sol";
 import "./ColorModifiers.sol";
 
-contract ColomintJackpot is VRFConsumerBase, Ownable {
+contract Jackpot is VRFConsumerBase, Ownable {
+    //VRF variables
+    bytes32 internal keyHash;
+    uint256 internal fee;
+
+    uint256 public randomness;
+    bytes32 public randomHash;
+    uint256 public randomBytes;
+
     address payable[] public minters;
     address payable admin;
-
-    struct RGB {
-        uint256 R;
-        uint256 G;
-        uint256 B;
-    }
 
     enum LOTTERY_STATE {
         OPEN,
@@ -31,7 +33,7 @@ contract ColomintJackpot is VRFConsumerBase, Ownable {
 
     //Addresses of subcontracts
 
-    address public colorsNFTaddress;
+    address public colorsNFTAddress;
     address public colorModifiersAddress;
 
     //Contracts
@@ -61,6 +63,8 @@ contract ColomintJackpot is VRFConsumerBase, Ownable {
         // startLottery() could be here or not depending of definition I would say not tbd
     }
 
+    // Owner functions to start restart Lottery
+
     function startLottery() public onlyOwner {
         // start count down.. when it is done you can execute end lottery
         require(
@@ -72,7 +76,7 @@ contract ColomintJackpot is VRFConsumerBase, Ownable {
 
     function restartLottery() public onlyOwner {
         require(
-            lottery_state == LOTERY_STATE.CLOSED,
+            lottery_state == LOTTERY_STATE.CLOSED,
             "Can't restart until finished"
         );
         colorModifiers = new ColorModifiers();
@@ -85,16 +89,14 @@ contract ColomintJackpot is VRFConsumerBase, Ownable {
         startLottery(); // I think start lottery here is ok instead of waiting owner to do it again .. tbd)
     }
 
-    // Owner functions to start end Lottery
-
     function getBalance() public returns (uint256) {
         return address(this).balance;
     }
 
-    function endLottery() {
+    function endLottery() public {
         require(block.timestamp >= deadline, "Countdown has not finished!");
         lottery_state = LOTTERY_STATE.CALCULATING_WINNER;
-        getRandomnumber();
+        getRandomNumber();
     }
 
     // function pickWinner() public {
@@ -122,22 +124,25 @@ contract ColomintJackpot is VRFConsumerBase, Ownable {
         randomHash = keccak256(abi.encodePacked(_randomness));
 
         //transform _randomness into RGB named winnerRGB and comment next line TD
-        RGB winnerRGB = RGB(1, 1, 1);
+
+        // lets say RGB is 1 1 1 considering C = 256^2*R +256 *G +B; maximum rgb (255,255,255) would be 16,777,216
+
+        uint256 winnerRGB = 256**2 + 256 + 1;
 
         // Get the list of all the ColorNFT tokens
 
-        RGB[] listOfTokens = colorsNFT.colorTokenList;
+        uint256[] memory listOfNFTS = colorsNFT._colorTokenList();
 
         uint256 tokenIdFromWinner;
 
-        address winner;
+        address payable winner;
 
-        for (uint256 i = 0; i < listOfTokens.length; i++) {
-            if (listOfTokens[i] == winnerRGB) {
-                tokenIdFromWinner = colorsNFT.colorToToken[winnerRGB];
-                winner = colorsNFT.tokenToOwner[tokenIdFromWinner];
+        for (uint256 i = 0; i < listOfNFTS.length; i++) {
+            if (listOfNFTS[i] == winnerRGB) {
+                tokenIdFromWinner = colorsNFT.colorToToken(winnerRGB);
+                winner = colorsNFT.tokenToOwner(tokenIdFromWinner);
+                lottery_state = LOTTERY_STATE.CLOSED;
                 winner.transfer(address(this).balance);
-                lottery_state = LOTERY_STATE.CLOSED;
                 return;
             } else {
                 //nobody has the exact color do color range aumentation here TD..
