@@ -7,6 +7,7 @@ import "@openzeppelin/contracts/utils/Counters.sol";
 import "@chainlink/contracts/src/v0.8/VRFConsumerBase.sol";
 import "./ColorsNFT.sol";
 import "./ColorModifiers.sol";
+import "hardhat/console.sol";
 
 contract Jackpot is VRFConsumerBase, Ownable {
     //VRF variables
@@ -60,7 +61,7 @@ contract Jackpot is VRFConsumerBase, Ownable {
         colorModifiersAddress = address(colorModifiers);
 
         //TD need to define a way that colorsNFT only accepts he ERC1155 tokens from colorModifiersAddress
-        colorsNFT = new ColorsNFT(colorModifiersAddress);
+        colorsNFT = new ColorsNFT(colorModifiersAddress, address(this));
         colorsNFTAddress = address(colorsNFT);
         lottery_state = LOTTERY_STATE.OPEN;
         // startLottery() could be here or not depending of definition I would say not tbd startLottery function should be changed to onlySelf then
@@ -85,7 +86,7 @@ contract Jackpot is VRFConsumerBase, Ownable {
         colorModifiers = new ColorModifiers(address(this));
         colorModifiersAddress = address(colorModifiers);
 
-        colorsNFT = new ColorsNFT(colorModifiersAddress);
+        colorsNFT = new ColorsNFT(colorModifiersAddress, address(this));
         colorsNFTAddress = address(colorsNFT);
         lottery_state = LOTTERY_STATE.OPEN;
         startLottery(); // If it is used here startLottery should be onlySelf instead of onlyOwner , or maybe we can do a modifier that works with onlyowner and onlyself at the same time
@@ -129,6 +130,35 @@ contract Jackpot is VRFConsumerBase, Ownable {
 
         // lets say RGB is 1 1 1 considering C = 256^2*R +256 *G +B; maximum rgb (255,255,255) would be 16,777,216
 
+        uint256 winnerRGB = 256**2 + 256 + 1;
+
+        // Get the list of all the ColorNFT tokens
+
+        uint256[] memory listOfNFTS = colorsNFT._colorTokenList();
+
+        uint256 tokenIdFromWinner;
+
+        address payable winner;
+
+        for (uint256 i = 0; i < listOfNFTS.length; i++) {
+            if (listOfNFTS[i] == winnerRGB) {
+                tokenIdFromWinner = colorsNFT.colorToToken(winnerRGB);
+                winner = colorsNFT.tokenToOwner(tokenIdFromWinner);
+                lottery_state = LOTTERY_STATE.CLOSED;
+                winner.transfer(address(this).balance);
+                return;
+            } else {
+                //nobody has the exact color do color range aumentation here TD..
+            }
+        }
+    }
+
+    // For tests when we are ready to deploy this function should be commented/deleted
+    function fullFillRandomnessTests() public {
+        //transform _randomness into RGB named winnerRGB and comment next line TD
+
+        // lets say RGB is 1 1 1 considering C = 256^2*R +256 *G +B; maximum rgb (255,255,255) would be 16,777,216
+        // require(block.timestamp >= deadline, "Countdown has not finished!");
         uint256 winnerRGB = 256**2 + 256 + 1;
 
         // Get the list of all the ColorNFT tokens

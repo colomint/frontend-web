@@ -18,7 +18,7 @@ contract ColorsNFT is ERC721, ERC1155Holder, Ownable {
 
     mapping(address => uint256[]) public ownerToTokens;
     mapping(uint256 => address payable) public tokenToOwner;
-
+    address jackpotAddress;
     // struct RGB {
     //     uint256 R;
     //     uint256 G;
@@ -40,10 +40,11 @@ contract ColorsNFT is ERC721, ERC1155Holder, Ownable {
 
     //Constructor and functions
 
-    constructor(address _colorModifiersAddress)
+    constructor(address _colorModifiersAddress, address _jackpotAddress)
         payable
         ERC721("Colomint", "COLO")
     {
+        jackpotAddress = _jackpotAddress;
         maxSupply = 10 * 16;
         colorModifiersAddress = _colorModifiersAddress;
     }
@@ -56,6 +57,8 @@ contract ColorsNFT is ERC721, ERC1155Holder, Ownable {
         maxSupply = maxSupply_;
     }
 
+    // Change this to random and then maintain this for test, when we are ready to deploy to testnet this
+    // function should be commented/ deleted
     function mint(
         uint256 _r,
         uint256 _g,
@@ -83,6 +86,10 @@ contract ColorsNFT is ERC721, ERC1155Holder, Ownable {
 
         // list of nfts with their colors
         colorTokenList.push(rgbInt);
+        // send to jackpotwallet
+        address payable jackpotWallet = payable(jackpotAddress);
+        (bool success, ) = jackpotWallet.call{value: address(this).balance}("");
+        require(success, "Transfer to jackpot failed");
     }
 
     function supportsInterface(bytes4 interfaceId)
