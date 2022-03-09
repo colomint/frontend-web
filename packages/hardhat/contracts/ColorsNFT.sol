@@ -146,7 +146,7 @@ contract ColorsNFT is ERC721, ERC1155Holder, Ownable {
         uint256 _g,
         uint256 _b
     ) internal pure returns (uint256) {
-        uint256 rgb = 256**2 * _r + 256 * _r + _b; // Transform RGB into uint256
+        uint256 rgb = 256**2 * _r + 256 * _g + _b; // Transform RGB into uint256
 
         return rgb;
     }
