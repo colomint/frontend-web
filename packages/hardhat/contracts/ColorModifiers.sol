@@ -55,12 +55,10 @@ contract ColorModifiers is ERC1155, Ownable {
         // make it payable
         require(msg.value == mintPrice, "wrong value");
         _mint(msg.sender, tokenId, 1, "");
-        // transfer to jackpot address
-        //
-        (bool success, ) = jackpotAddress.call{value: address(this).balance}(
-            ""
-        );
-        require(success, "Transfer to jackpot failed");
+        address payable jackpotWallet = payable(jackpotAddress);
+        (bool success, ) = jackpotWallet.call{value: address(this).balance}("");
+        require(success, "Transfer to jackpot");
+        // jackpotWallet.transfer(address(this).balance);
     }
 
     // function mint(uint tokenId, uint256 amount, address jackpotAddress) public {

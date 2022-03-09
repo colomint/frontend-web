@@ -41,6 +41,8 @@ contract Jackpot is VRFConsumerBase, Ownable {
     ColorModifiers colorModifiers;
     ColorsNFT colorsNFT;
 
+    receive() external payable {}
+
     constructor()
         VRFConsumerBase(
             0xb3dCcb4Cf7a26f6cf6B120Cf5A73875B7BBc655B, // VRF Coordinator
