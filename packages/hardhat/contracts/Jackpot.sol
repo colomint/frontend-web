@@ -53,11 +53,12 @@ contract Jackpot is VRFConsumerBase, Ownable {
 
         // Define and deploy subcontracts
 
-        colorModifiers = new ColorModifiers();
+        // TD change this to a only fixed address when final version of colorModifiers is ready
+        colorModifiers = new ColorModifiers(address(this));
         colorModifiersAddress = address(colorModifiers);
 
-        //TD need to define a way that colorsNFT only accepts the ERC1155 tokens from colorModifiersAddress
-        colorsNFT = new ColorsNFT();
+        //TD need to define a way that colorsNFT only accepts he ERC1155 tokens from colorModifiersAddress
+        colorsNFT = new ColorsNFT(colorModifiersAddress);
         colorsNFTAddress = address(colorsNFT);
         lottery_state = LOTTERY_STATE.OPEN;
         // startLottery() could be here or not depending of definition I would say not tbd startLottery function should be changed to onlySelf then
@@ -79,7 +80,7 @@ contract Jackpot is VRFConsumerBase, Ownable {
             lottery_state == LOTTERY_STATE.CLOSED,
             "Can't restart until finished"
         );
-        colorModifiers = new ColorModifiers();
+        colorModifiers = new ColorModifiers(address(this));
         colorModifiersAddress = address(colorModifiers);
 
         colorsNFT = new ColorsNFT(colorModifiersAddress);

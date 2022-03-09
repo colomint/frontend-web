@@ -8,15 +8,20 @@ contract ColorModifiers is ERC1155, Ownable {
     uint256 public constant DARKPAINT = 0;
     uint256 public constant WHITEPAINT = 1;
 
-    struct RGB {
-        uint256 R;
-        uint256 G;
-        uint256 B;
-    }
+    // struct RGB {
+    //     uint256 R;
+    //     uint256 G;
+    //     uint256 B;
+    // }
 
-    constructor() ERC1155("https://game.example/api/item{id}.json") {
-        _mint(msg.sender, DARKPAINT, 2000, "");
-        _mint(msg.sender, WHITEPAINT, 2000, "");
+    address jackpotAddress;
+
+    uint256 public mintPrice = 0.00001 ether;
+
+    constructor(address _jackpotAddress)
+        ERC1155("https://game.example/api/item{id}.json")
+    {
+        jackpotAddress = _jackpotAddress;
     }
 
     function name() public pure returns (string memory) {
@@ -35,8 +40,34 @@ contract ColorModifiers is ERC1155, Ownable {
         return balanceOf(owner, 1);
     }
 
+    // this one for free
     function mint() public {
-        _mint(msg.sender, DARKPAINT, 100, "");
-        _mint(msg.sender, WHITEPAINT, 100, "");
+        // make it payable
+        _mint(msg.sender, DARKPAINT, 2, "");
+        _mint(msg.sender, WHITEPAINT, 2, "");
+        // transfer to jackpot address
+        //
     }
+
+    // this one costs and sends money to jackpotAddress
+
+    function mintPayable(uint256 tokenId) external payable {
+        // make it payable
+        require(msg.value == mintPrice, "wrong value");
+        _mint(msg.sender, tokenId, 1, "");
+        // transfer to jackpot address
+        //
+        (bool success, ) = jackpotAddress.call{value: address(this).balance}(
+            ""
+        );
+        require(success, "Transfer to jackpot failed");
+    }
+
+    // function mint(uint tokenId, uint256 amount, address jackpotAddress) public {
+    //     // make it payable
+
+    //     _mint(msg.sender, tokenId, amount, "");
+    //     // transfer to jackpot address
+    //     // transfer to jackpot adderess
+    // }
 }
