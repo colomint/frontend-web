@@ -14,11 +14,8 @@ contract Jackpot is VRFConsumerBase, Ownable {
     bytes32 internal keyHash;
     uint256 internal fee;
 
-    uint256 public randomness;
-    bytes32 public randomHash;
-    uint256 public randomBytes;
+    bytes32 private requestId;
 
-    address payable[] public minters;
     address payable admin;
 
     enum LOTTERY_STATE {
@@ -29,6 +26,7 @@ contract Jackpot is VRFConsumerBase, Ownable {
 
     // countdown to finish lottery
     uint256 deadline;
+    uint256 winningColor;
 
     LOTTERY_STATE public lottery_state;
 
@@ -64,7 +62,6 @@ contract Jackpot is VRFConsumerBase, Ownable {
         colorsNFT = new ColorsNFT(colorModifiersAddress, address(this));
         colorsNFTAddress = address(colorsNFT);
         lottery_state = LOTTERY_STATE.OPEN;
-        // startLottery() could be here or not depending of definition I would say not tbd startLottery function should be changed to onlySelf then
     }
 
     // Owner functions to start restart Lottery
@@ -76,6 +73,7 @@ contract Jackpot is VRFConsumerBase, Ownable {
             "Can't start if it is not closed"
         );
         deadline = block.timestamp + 2 minutes;
+        winningColor = 0;
     }
 
     function restartLottery() public onlyOwner {
@@ -92,102 +90,69 @@ contract Jackpot is VRFConsumerBase, Ownable {
         startLottery(); // If it is used here startLottery should be onlySelf instead of onlyOwner , or maybe we can do a modifier that works with onlyowner and onlyself at the same time
     }
 
-    function getBalance() public returns (uint256) {
+    function getBalance() public view returns (uint256) {
         return address(this).balance;
     }
 
     function endLottery() public {
         require(block.timestamp >= deadline, "Countdown has not finished!");
-        lottery_state = LOTTERY_STATE.CALCULATING_WINNER;
-        getRandomNumber();
+
+        if (colorsNFT.totalSupply() > 0) {
+            lottery_state = LOTTERY_STATE.CALCULATING_WINNER;
+            requestId = getRandomNumber();
+        }
+        else {
+            lottery_state = LOTTERY_STATE.CLOSED;
+        }
     }
 
-    // function pickWinner() public {
-    //     require(admin == msg.sender, "You are not the owner");
-    //     require(minters.length >= 5, "Not enough minters participating");
-    //     address payable winner;
-    //     // winner = minters[random() % minters.length];
-    //     //get random rgb with chainlink
-
-    //     // check who has the nft closest
-
-    // }
-
-    function getRandomNumber() public returns (bytes32 requestId) {
+    function getRandomNumber() public returns (bytes32 _requestId) {
         require(LINK.balanceOf(address(this)) >= fee, "Not enough LINK");
         return requestRandomness(keyHash, fee);
     }
 
-    function fulfillRandomness(bytes32 requestId, uint256 _randomness)
+    function fulfillRandomness(bytes32 _requestId, uint256 _randomness)
         internal
         override
     {
-        randomness = _randomness;
+        require(_requestId != 0, "Currently not expecting any randomness!");
+        require(_requestId == requestId, "Invalid request ID for randomness!");
 
-        randomHash = keccak256(abi.encodePacked(_randomness));
+        requestId = 0;
 
-        //transform _randomness into RGB named winnerRGB and comment next line TD
-
-        // lets say RGB is 1 1 1 considering C = 256^2*R +256 *G +B; maximum rgb (255,255,255) would be 16,777,216
-
-        uint256 winnerRGB = 256**2 + 256 + 1;
-
-        // Get the list of all the ColorNFT tokens
-
-        uint256[] memory listOfNFTS = colorsNFT._colorTokenList();
-
-        uint256 tokenIdFromWinner;
-
-        address payable winner;
-
-        for (uint256 i = 0; i < listOfNFTS.length; i++) {
-            if (listOfNFTS[i] == winnerRGB) {
-                tokenIdFromWinner = colorsNFT.colorToToken(winnerRGB);
-                winner = colorsNFT.tokenToOwner(tokenIdFromWinner);
-                lottery_state = LOTTERY_STATE.CLOSED;
-                winner.transfer(address(this).balance);
-                return;
-            } else {
-                //nobody has the exact color do color range aumentation here TD..
-            }
-        }
-              
-    // function distributeToken(address[] addresses, uint256 _value) onlyOwner {
-               
-    //            for (uint i = 0; i < addresses.length; i++) {
-    //             balances[owner] -= _value;
-    //             balances[addresses[i]] += _value;
-    //             Transfer(owner, addresses[i], _value);
-       
-    //     }
+        distributeWinnings(_randomness % (2**24));
     }
 
-    // For tests when we are ready to deploy this function should be commented/deleted
-    function fullFillRandomnessTests() public {
-        //transform _randomness into RGB named winnerRGB and comment next line TD
+    // TODO Public for testing only! Make this private before going to production!
+    function distributeWinnings(uint256 jackpotColor) public {
+        lottery_state = LOTTERY_STATE.CLOSED;
+        winningColor = jackpotColor;
 
-        // lets say RGB is 1 1 1 considering C = 256^2*R +256 *G +B; maximum rgb (255,255,255) would be 16,777,216
-        // require(block.timestamp >= deadline, "Countdown has not finished!");
-        uint256 winnerRGB = 256**2 + 256 + 1;
+        uint256 minDistance;
+        address payable[] memory winners = new address payable[](colorsNFT.totalSupply());
+        uint256 numberWinners;
 
-        // Get the list of all the ColorNFT tokens
-
-        uint256[] memory listOfNFTS = colorsNFT._colorTokenList();
-
-        uint256 tokenIdFromWinner;
-
-        address payable winner;
-
-        for (uint256 i = 0; i < listOfNFTS.length; i++) {
-            if (listOfNFTS[i] == winnerRGB) {
-                tokenIdFromWinner = colorsNFT.colorToToken(winnerRGB);
-                winner = colorsNFT.tokenToOwner(tokenIdFromWinner);
-                lottery_state = LOTTERY_STATE.CLOSED;
-                winner.transfer(address(this).balance);
-                return;
-            } else {
-                //nobody has the exact color do color range aumentation here TD..
+        uint256 currDistance;
+        for (uint256 i = 1; i <= colorsNFT.totalSupply(); i++) {
+            if (colorsNFT.tokenToOwner(i) == address(0)) {
+                continue;
             }
+
+            currDistance = colorsNFT.colorDistance(winningColor, colorsNFT.tokenToColor(i));
+            if (currDistance < minDistance) {
+                minDistance = currDistance;
+                winners[0] = colorsNFT.tokenToOwner(i);
+                numberWinners = 1;
+            } else if (currDistance == minDistance) {
+                winners[numberWinners] = colorsNFT.tokenToOwner(i);
+                numberWinners++;
+            }
+        }
+
+        for (uint256 i = 1; i < numberWinners; i++) {
+            // Use `send` to transfer money and ignore all errors. Otherwise, smart contracts entering into the lottery
+            // and refusing to accept their winnings may block the system forever.
+            winners[i].send(address(this).balance / numberWinners);
         }
     }
 }

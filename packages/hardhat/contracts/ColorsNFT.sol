@@ -14,7 +14,6 @@ contract ColorsNFT is ERC721, ERC1155Holder, Ownable {
     mapping(address => uint256) public mintedTokens;
 
     mapping(uint256 => uint256) public tokenToColor;
-    mapping(uint256 => uint256) public colorToToken;
 
     mapping(address => uint256[]) public ownerToTokens;
     mapping(uint256 => address payable) public tokenToOwner;
@@ -78,7 +77,6 @@ contract ColorsNFT is ERC721, ERC1155Holder, Ownable {
         uint256 rgbInt = rgbToInt(_r, _g, _b);
 
         tokenToColor[tokenId - 1] = rgbInt;
-        colorToToken[rgbInt] = tokenId - 1;
 
         // owner and Tokens relations
         ownerToTokens[msg.sender].push(tokenId - 1);
