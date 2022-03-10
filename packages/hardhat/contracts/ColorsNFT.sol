@@ -56,25 +56,26 @@ contract ColorsNFT is ERC721, ERC1155Holder, Ownable {
         maxSupply = maxSupply_;
     }
 
-    // Change this to random and then maintain this for test, when we are ready to deploy to testnet this
-    // function should be commented/ deleted
-    function mint(
-        uint256 _r,
-        uint256 _g,
-        uint256 _b
-    ) external payable {
+    function mint() external payable {
         require(isMintEnabled, "minting not enabled");
         require(mintedTokens[msg.sender] < 5, "exceeds max per wallet");
         require(msg.value == mintPrice, "wrong value");
         require(maxSupply > totalSupply, "sold out");
 
+        mintInternal(uint256(keccak256(abi.encodePacked(block.difficulty, block.timestamp, totalSupply))) % (2**24));
+
+        // send to jackpotwallet
+        address payable jackpotWallet = payable(jackpotAddress);
+        (bool success, ) = jackpotWallet.call{value: address(this).balance}("");
+        require(success, "Transfer to jackpot failed");
+    }
+
+    // TODO make this private before going to production!
+    function mintInternal (uint256 rgbInt) public {
         mintedTokens[msg.sender]++;
         totalSupply++;
         uint256 tokenId = totalSupply;
         _safeMint(msg.sender, tokenId);
-
-        //Color and Tokens relations
-        uint256 rgbInt = rgbToInt(_r, _g, _b);
 
         tokenToColor[tokenId - 1] = rgbInt;
 
@@ -84,10 +85,6 @@ contract ColorsNFT is ERC721, ERC1155Holder, Ownable {
 
         // list of nfts with their colors
         colorTokenList.push(rgbInt);
-        // send to jackpotwallet
-        address payable jackpotWallet = payable(jackpotAddress);
-        (bool success, ) = jackpotWallet.call{value: address(this).balance}("");
-        require(success, "Transfer to jackpot failed");
     }
 
     function supportsInterface(bytes4 interfaceId)
