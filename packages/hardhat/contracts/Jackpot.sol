@@ -26,9 +26,9 @@ contract Jackpot is VRFConsumerBase, Ownable {
 
     // countdown to finish lottery
     uint256 deadline;
-    uint256 winningColor;
 
     LOTTERY_STATE public lottery_state;
+    uint256 public winningColor;
 
     //Addresses of subcontracts
 
