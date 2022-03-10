@@ -14,6 +14,12 @@ module.exports = {
         ts: "never",
       },
     ],
+    "dot-notation": [
+      "error",
+      {
+        allowPattern: "^_.*$",
+      },
+    ],
     "import/prefer-default-export": "off",
     "prefer-destructuring": "off",
     "prefer-template": "off",

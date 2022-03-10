@@ -107,6 +107,23 @@ describe("Tests Colormint", function () {
           expect(result).to.equal(testVal[0]);
         }
       });
+
+      it("converts integers to colors", async function () {
+        function hexToArray(rgbHex) {
+          return [
+            parseInt(rgbHex.r["_hex"], 16),
+            parseInt(rgbHex.g["_hex"], 16),
+            parseInt(rgbHex.b["_hex"], 16),
+          ];
+        }
+
+        for (const testVal of testValues) {
+          // eslint-disable-next-line no-await-in-loop
+          const result = await colorNFTContract.intToRgb(testVal[0]);
+          hexToArray(result);
+          expect(hexToArray(result)).to.eql(testVal[1]);
+        }
+      });
     });
   });
 });
