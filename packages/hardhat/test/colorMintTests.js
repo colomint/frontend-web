@@ -4,7 +4,7 @@ const { solidity } = require("ethereum-waffle");
 
 use(solidity);
 
-describe("Tests Colormint", function () {
+describe("Tests ColoMint", function () {
   let jackpotContract;
   let colorModifierAddress;
   let colorsNFTAddress;
@@ -122,6 +122,36 @@ describe("Tests Colormint", function () {
           const result = await colorNFTContract.intToRgb(testVal[0]);
           hexToArray(result);
           expect(hexToArray(result)).to.eql(testVal[1]);
+        }
+      });
+    });
+
+    describe("rgb color distance calculation", async function () {
+      /* eslint-disable prettier/prettier */
+      const testValues = [
+        [16777215, 16711680, 510],
+        [16711680,    65280, 510],
+        [16777215, 16777215,   0],
+        [       0,        0,   0],
+        [ 8069635,        0, 160],
+        [ 4607087, 14661978, 283],
+      ];
+      /* eslint-enable prettier/prettier */
+
+      it("calculates color distance correctly", async function () {
+        for (const testVal of testValues) {
+          // eslint-disable-next-line no-await-in-loop
+          const result = await colorNFTContract.colorDistance(
+            testVal[0],
+            testVal[1]
+          );
+          // eslint-disable-next-line no-await-in-loop
+          const resultInverted = await colorNFTContract.colorDistance(
+            testVal[1],
+            testVal[0]
+          );
+          expect(parseInt(result["_hex"], 16)).to.equal(testVal[2]);
+          expect(parseInt(resultInverted["_hex"], 16)).to.equal(testVal[2]);
         }
       });
     });
