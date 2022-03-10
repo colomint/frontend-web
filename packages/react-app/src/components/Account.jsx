@@ -77,12 +77,12 @@ export default function Account({
         <Button
           key="loginbutton"
           style={{ verticalAlign: "top", marginLeft: 8, marginTop: 4 }}
-          shape="round"
+          shape="default"
           size="large"
           /* type={minimized ? "default" : "primary"}     too many people just defaulting to MM and having a bad time */
           onClick={loadWeb3Modal}
         >
-          connect
+          CONNECT TO YOUR WALLET
         </Button>,
       );
     }
@@ -94,7 +94,7 @@ export default function Account({
       {web3Modal && web3Modal.cachedProvider ? (
         <>
           {address && <Address address={address} ensProvider={mainnetProvider} blockExplorer={blockExplorer} />}
-          <Balance address={address} provider={localProvider} price={price} />
+          {/* <Balance address={address} provider={localProvider} price={price} /> */}
           <Wallet
             address={address}
             provider={localProvider}
@@ -109,7 +109,7 @@ export default function Account({
       ) : isContract ? (
         <>
           {address && <Address address={address} ensProvider={mainnetProvider} blockExplorer={blockExplorer} />}
-          <Balance address={address} provider={localProvider} price={price} />
+          {/* <Balance address={address} provider={localProvider} price={price} /> */}
         </>
       ) : (
         ""
@@ -117,7 +117,7 @@ export default function Account({
       {useBurner && web3Modal && !web3Modal.cachedProvider ? (
         <>
           <Address address={address} ensProvider={mainnetProvider} blockExplorer={blockExplorer} />
-          <Balance address={address} provider={localProvider} price={price} />
+          {/* <Balance address={address} provider={localProvider} price={price} /> */}
           <Wallet
             address={address}
             provider={localProvider}
