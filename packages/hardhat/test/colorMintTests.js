@@ -86,10 +86,19 @@ describe("Tests Colormint", function () {
     });
 
     describe("rgb integer conversion", async function () {
+      /* eslint-disable prettier/prettier */
       const testValues = [
-        [16711680, [255, 0, 0]],
-        [8069635, [123, 34, 3]],
+        [16777215, [255, 255, 255]],
+        [16711680, [255,   0,   0]],
+        [   65280, [  0, 255,   0]],
+        [     255, [  0,   0, 255]],
+        [       0, [  0,   0,   0]],
+        [ 8069635, [123,  34,   3]],
+        [12614096, [192, 121, 208]],
+        [ 4607087, [ 70,  76, 111]],
+        [14661978, [223, 185,  90]],
       ];
+      /* eslint-enable prettier/prettier */
 
       it("converts colors to integers", async function () {
         for (const testVal of testValues) {
