@@ -152,10 +152,38 @@ contract ColorsNFT is ERC721, ERC1155Holder, Ownable {
         uint256 _r,
         uint256 _g,
         uint256 _b
-    ) internal pure returns (uint256) {
+    ) public pure returns (uint256) {
         uint256 rgb = 256**2 * _r + 256 * _g + _b; // Transform RGB into uint256
 
         return rgb;
+    }
+
+    function intToRgb(
+        uint256 color
+    ) public pure returns (uint256 r, uint256 g, uint256 b) {
+        uint256 _r = color / (256**2);
+        uint256 _g = (color - _r * (256**2)) / 256;
+        uint256 _b = color - _r * (256**2) - _g * 256;
+
+        return (_r, _g, _b);
+    }
+
+    function colorDistance(
+        uint256 colorOne,
+        uint256 colorTwo
+    ) public pure returns (uint256 distance) {
+        (uint256 rOne, uint256 gOne, uint256 bOne) = intToRgb(colorOne);
+        (uint256 rTwo, uint256 gTwo, uint256 bTwo) = intToRgb(colorTwo);
+        uint256 _distance = absDiff(rOne, rTwo) + absDiff(gOne, gTwo) + absDiff(bOne, bTwo);
+
+        return _distance;
+    }
+
+    function absDiff(
+        uint256 valueOne,
+        uint256 valueTwo
+    ) public pure returns (uint256 absValue) {
+        return valueOne >= valueTwo ? valueOne - valueTwo : valueTwo - valueOne;
     }
 
     function getColorsByOwner(address _owner)

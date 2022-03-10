@@ -8,22 +8,26 @@ describe("Tests Colormint", function () {
   let jackpotContract;
   let colorModifierAddress;
   let colorsNFTAddress;
+  let colorNFTContract;
+  let deployer;
+  let user2;
+  let user3;
 
   before(async function () {
     const getAccounts = async function () {
-      let accounts = [];
+      const accounts = [];
       let signers = [];
-      signers = await hre.ethers.getSigners();
+      signers = await ethers.getSigners();
       for (const signer of signers) {
+        // eslint-disable-next-line no-await-in-loop
         accounts.push({ signer, address: await signer.getAddress() });
-      } //populates the accounts array with addresses.
+      } // populates the accounts array with addresses.
       return accounts;
     };
 
     // REFACTOR
     [deployer, user2, user3] = await getAccounts();
   });
-
 
   before((done) => {
     setTimeout(done, 2000);
@@ -38,7 +42,6 @@ describe("Tests Colormint", function () {
 
     describe("getContracts()", function () {
       it("Should make two contracts", async function () {
-
         const count = [];
 
         colorModifierAddress = await jackpotContract.colorModifiersAddress();
@@ -51,8 +54,6 @@ describe("Tests Colormint", function () {
       });
 
       it("Should start the lottery", async function () {
-
-
         await jackpotContract.startLottery();
 
         const lotteryStatus = 0; // OPEN
@@ -61,13 +62,9 @@ describe("Tests Colormint", function () {
       });
 
       it("User 3 should be the winner and jackpot should be empty after distribution", async function () {
-
-
         const colorsNFTCFactory = await ethers.getContractFactory("ColorsNFT");
 
-        const colorNFTContract = await colorsNFTCFactory.attach(
-          colorsNFTAddress
-        )
+        colorNFTContract = await colorsNFTCFactory.attach(colorsNFTAddress);
 
         const provider = waffle.provider;
 
@@ -75,20 +72,32 @@ describe("Tests Colormint", function () {
         // for testings the winner value is 1 1 1 
         const txLoserBuy = await colorNFTContract.connect(user2.signer).mint(10, 10, 10, { value: ethers.utils.parseEther("0.00001") })
 
-        const txWinner = await (jackpotContract.fullFillRandomnessTests())
+        const txWinner = await jackpotContract.fullFillRandomnessTests();
         const jackPotBalancePost = await provider.getBalance(jackpotContract.address);
 
 
         const balanceWinner = await ethers.provider.getBalance(user3.address);
         const balanceLoser = await ethers.provider.getBalance(user2.address);
 
-
         expect(parseInt(balanceLoser['_hex'], 16)).to.below(parseInt(balanceWinner['_hex'], 16));
         expect(parseInt(jackPotBalancePost['_hex'], 16)).to.equal(0);
 
       });
+    });
 
+    describe("rgb integer conversion", async function () {
+      const testValues = [
+        [16711680, [255, 0, 0]],
+        [8069635, [123, 34, 3]],
+      ];
 
+      it("converts colors to integers", async function () {
+        for (const testVal of testValues) {
+          // eslint-disable-next-line no-await-in-loop
+          const result = await colorNFTContract.rgbToInt(...testVal[1]);
+          expect(result).to.equal(testVal[0]);
+        }
+      });
     });
   });
 });
