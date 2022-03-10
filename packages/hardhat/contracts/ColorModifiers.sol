@@ -61,11 +61,17 @@ contract ColorModifiers is ERC1155, Ownable {
         // jackpotWallet.transfer(address(this).balance);
     }
 
-    // function mint(uint tokenId, uint256 amount, address jackpotAddress) public {
-    //     // make it payable
+    function mint () external payable {
+                      require (isMintEnabled, "minting not enabled");
+                      require(mintedWallets[msg.sender] < 2, "exceeds max per wallet");
+                      require(msg.value == mintPrice, "wrong value");
+                      require(maxSupply > totalSupply, "sold out");
 
-    //     _mint(msg.sender, tokenId, amount, "");
-    //     // transfer to jackpot address
-    //     // transfer to jackpot adderess
-    // }
+                      mintedWallets[msg.sender]++;
+                      totalSupply++;
+                      uint256 tokenId = totalSupply;
+                      _safeMint(msg.sender, tokenId);
+     
+    
+   }
 }
