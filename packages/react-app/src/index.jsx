@@ -4,6 +4,8 @@ import { ThemeSwitcherProvider } from "react-css-theme-switcher";
 import { BrowserRouter } from "react-router-dom";
 import ReactDOM from "react-dom";
 import App from "./App";
+
+import { DAppProvider, Rinkeby } from "@usedapp/core"
 import "./index.css";
 
 const themes = {
@@ -24,7 +26,16 @@ ReactDOM.render(
   <ApolloProvider client={client}>
     <ThemeSwitcherProvider themeMap={themes} defaultTheme={prevTheme || "light"}>
       <BrowserRouter>
-        <App subgraphUri={subgraphUri} />
+        <DAppProvider config={{
+          networks: [Rinkeby],
+          notifications: {
+            expirationPeriod: 1000,
+            checkInterval: 1000
+          }
+        }}>
+          <App subgraphUri={subgraphUri} />
+        </DAppProvider>
+
       </BrowserRouter>
     </ThemeSwitcherProvider>
   </ApolloProvider>,

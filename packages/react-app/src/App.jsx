@@ -29,8 +29,19 @@ import externalContracts from "./contracts/external_contracts";
 // contracts
 import deployedContracts from "./contracts/hardhat_contracts.json";
 import { Transactor, Web3ModalSetup } from "./helpers";
-import { Home, ExampleUI, Hints, Subgraph } from "./views";
+import { Home, ExampleUI, Hints, Subgraph, BuyAndModifyColor } from "./views";
 import { useStaticJsonRPC } from "./hooks";
+
+
+/// 
+import ColorsNFT from "./contracts/ColorsNFT.json";
+import ColorsModifiers from "./contracts/ColorModifiers.json";
+import { Contract as ContractEthers } from "@ethersproject/contracts";
+import { useEthers, useContractFunction, DAppProvider, Rinkeby } from "@usedapp/core"
+import { constants, utils } from "ethers"
+
+
+////
 
 const { ethers } = require("ethers");
 /*
@@ -53,7 +64,7 @@ const { ethers } = require("ethers");
 */
 
 /// 📡 What chain are your contracts deployed to?
-const initialNetwork = NETWORKS.localhost; // <------- select your target frontend network (localhost, rinkeby, xdai, mainnet)
+const initialNetwork = NETWORKS.rinkeby; // <------- select your target frontend network (localhost, rinkeby, xdai, mainnet)
 
 // 😬 Sorry for all the console logging
 const DEBUG = true;
@@ -62,6 +73,8 @@ const USE_BURNER_WALLET = true; // toggle burner wallet feature
 const USE_NETWORK_SELECTOR = false;
 
 const web3Modal = Web3ModalSetup();
+
+
 
 // 🛰 providers
 const providers = [
@@ -93,6 +106,9 @@ function App(props) {
 
   if (DEBUG) console.log(`Using ${selectedNetwork} network`);
 
+
+
+
   // 🛰 providers
   if (DEBUG) console.log("📡 Connecting to Mainnet Ethereum");
 
@@ -115,6 +131,7 @@ function App(props) {
   const userProviderAndSigner = useUserProviderAndSigner(injectedProvider, localProvider, USE_BURNER_WALLET);
   const userSigner = userProviderAndSigner.signer;
 
+
   useEffect(() => {
     async function getAddress() {
       if (userSigner) {
@@ -124,6 +141,8 @@ function App(props) {
     }
     getAddress();
   }, [userSigner]);
+
+
 
   // You can warn the user if you would like them to be on a specific network
   const localChainId = localProvider && localProvider._network && localProvider._network.chainId;
@@ -144,6 +163,7 @@ function App(props) {
   // const contractConfig = useContractConfig();
 
   const contractConfig = { deployedContracts: deployedContracts || {}, externalContracts: externalContracts || {} };
+
 
   // Load in your local 📝 contract and read a value from it:
   const readContracts = useContractLoader(localProvider, contractConfig);
@@ -166,8 +186,60 @@ function App(props) {
     "0x34aA3F359A9D614239015126635CE7732c18fDF3",
   ]);
 
-  // keep track of a variable from the contract in the local React state:
-  const purpose = useContractReader(readContracts, "YourContract", "purpose");
+  // // keep track of a variable from the contract in the local React state:
+  // const purpose = useContractReader(readContracts, "YourContract", "randomHash");
+  // // keep track of white paint
+  // const whitePaint = useContractReader(readContracts, "ColorsNFT", "balanceOf");
+  // console.log("whitePaint", whitePaint);
+  // // dark paint
+  // const darkPaint = useContractReader(readContracts, "ColorModifiers", "balanceOf", ["0x990Ae48efDD87Ba85dEf8fb6633d0B7155539720", 0]);
+
+  const darkPaint = useContractReader(readContracts, "ColorModifiers", "getBalanceDarkPaint", [
+    address,
+  ]);
+
+
+  const whitePaint = useContractReader(readContracts, "ColorModifiers", "getBalanceWhitePaint", [address]);
+
+
+  const listOfTokensPerUser = useContractReader(readContracts, "ColorsNFT", "getColorsByOwner", [address,]);
+
+  const colorTokenList = useContractReader(readContracts, "ColorsNFT", "_colorTokenList");
+
+  console.log(colorTokenList);
+  const userTables = 0;
+
+  ///// 
+  const colorModifiersAddress = useContractReader(readContracts, "Jackpot", "colorModifiersAddress");
+
+  const colorsNFTAddress = useContractReader(readContracts, "Jackpot", "colorsNFTAddress");
+  console.log(colorsNFTAddress);
+  const purpose = "tt";
+  const ColorsModifiersABI = ColorsModifiers.abi;
+
+
+  const ColorsModifiersInterface = new utils.Interface(ColorsModifiersABI);
+  let colorModifiersContract
+  if (colorModifiersAddress) {
+    colorModifiersContract = new ContractEthers(colorModifiersAddress, ColorsModifiersInterface, userSigner)
+  }
+
+  const ColorsNFTABI = ColorsNFT.abi;
+
+  const ColorsNFTInterface = new utils.Interface(ColorsNFTABI);
+  let colorNFTContract
+  if (colorsNFTAddress) {
+    colorNFTContract = new ContractEthers(colorsNFTAddress, ColorsNFTInterface, userSigner)
+  }
+
+
+
+
+  // const darkPaint = readContracts["ColorModifiers"]?.balanceOf("0x990Ae48efDD87Ba85dEf8fb6633d0B7155539720", 0);
+
+
+  // const whitePaint = readContracts["ColorModifiers"]?.balanceOf("0x990Ae48efDD87Ba85dEf8fb6633d0B7155539720", 1);
+
 
   /*
   const addressFromENS = useResolveName(mainnetProvider, "austingriffith.eth");
@@ -200,6 +272,8 @@ function App(props) {
       console.log("🌍 DAI contract on mainnet:", mainnetContracts);
       console.log("💵 yourMainnetDAIBalance", myMainnetDAIBalance);
       console.log("🔐 writeContracts", writeContracts);
+      console.log("colorModifiersAddress", colorModifiersAddress);
+
     }
   }, [
     mainnetProvider,
@@ -232,6 +306,7 @@ function App(props) {
     provider.on("disconnect", (code, reason) => {
       console.log(code, reason);
       logoutOfWeb3Modal();
+
     });
     // eslint-disable-next-line
   }, [setInjectedProvider]);
@@ -244,7 +319,23 @@ function App(props) {
 
   const faucetAvailable = localProvider && localProvider.connection && targetNetwork.name.indexOf("local") !== -1;
 
+  /// userdapp 
+
+
+  const { activateBrowserWallet, deactivate, account } = useEthers()
+  ///
+
+
+
+  useEffect(() => {
+    if (userSigner) {
+      activateBrowserWallet();
+    }
+  }, [activateBrowserWallet, userSigner]);
+
+
   return (
+
     <div className="App">
       {/* ✏️ Edit the header and change the title to your project name */}
       <Header />
@@ -256,31 +347,35 @@ function App(props) {
         logoutOfWeb3Modal={logoutOfWeb3Modal}
         USE_NETWORK_SELECTOR={USE_NETWORK_SELECTOR}
       />
-      <Menu style={{ textAlign: "center", marginTop: 40 , backgroundImage:'url("Backgroud.jpeg")' }} selectedKeys={[location.pathname]} mode="horizontal">
+      <Menu style={{ textAlign: "center", marginTop: 40 }} selectedKeys={[location.pathname]} mode="horizontal">
         <Menu.Item key="/">
           <Link to="/">App Home</Link>
         </Menu.Item>
         <Menu.Item key="/debug">
           <Link to="/debug">Debug Contracts</Link>
         </Menu.Item>
-        <Menu.Item key="/hints">
-          <Link to="/hints">Hints</Link>
-        </Menu.Item>
         <Menu.Item key="/exampleui">
-          <Link to="/exampleui">ExampleUI</Link>
+          <Link to="/exampleui">Buy Color NFT and modify</Link>
         </Menu.Item>
-        <Menu.Item key="/mainnetdai">
-          <Link to="/mainnetdai">Mainnet DAI</Link>
-        </Menu.Item>
-        <Menu.Item key="/subgraph">
-          <Link to="/subgraph">Subgraph</Link>
-        </Menu.Item>
+
       </Menu>
 
       <Switch>
         <Route exact path="/">
           {/* pass in any web3 props to this Home component. For example, yourLocalBalance */}
-          <Home yourLocalBalance={yourLocalBalance} readContracts={readContracts} />
+          {/* <Home yourLocalBalance={yourLocalBalance} readContracts={readContracts} /> */}
+          <ExampleUI
+            address={address}
+            userSigner={userSigner}
+            mainnetProvider={mainnetProvider}
+            localProvider={localProvider}
+            yourLocalBalance={yourLocalBalance}
+            price={price}
+            tx={tx}
+            writeContracts={writeContracts}
+            readContracts={readContracts}
+            purpose={purpose}
+          />
         </Route>
         <Route exact path="/debug">
           {/*
@@ -298,6 +393,33 @@ function App(props) {
             blockExplorer={blockExplorer}
             contractConfig={contractConfig}
           />
+          <Contract
+            name="ColorsNFT"
+            price={price}
+            signer={userSigner}
+            provider={localProvider}
+            address={address}
+            blockExplorer={blockExplorer}
+            contractConfig={contractConfig}
+          />
+          <Contract
+            name="ColorModifiers"
+            price={price}
+            signer={userSigner}
+            provider={localProvider}
+            address={colorModifiersAddress}
+            blockExplorer={blockExplorer}
+            contractConfig={contractConfig}
+          />
+          <Contract
+            name="Jackpot"
+            price={price}
+            signer={userSigner}
+            provider={localProvider}
+            address={address}
+            blockExplorer={blockExplorer}
+            contractConfig={contractConfig}
+          />
         </Route>
         <Route path="/hints">
           <Hints
@@ -308,7 +430,7 @@ function App(props) {
           />
         </Route>
         <Route path="/exampleui">
-          <ExampleUI
+          <BuyAndModifyColor
             address={address}
             userSigner={userSigner}
             mainnetProvider={mainnetProvider}
@@ -319,6 +441,15 @@ function App(props) {
             writeContracts={writeContracts}
             readContracts={readContracts}
             purpose={purpose}
+            whitePaint={whitePaint}
+            darkPaint={darkPaint}
+            userTables={userTables}
+            listOfTokensPerUser={listOfTokensPerUser}
+            colorTokenList={colorTokenList}
+            colorModifiersContract={colorModifiersContract}
+            colorModifiersAddress={colorModifiersAddress}
+            colorNFTContract={colorNFTContract}
+            colorsNFTAddress={colorsNFTAddress}
           />
         </Route>
         <Route path="/mainnetdai">
