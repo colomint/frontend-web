@@ -62,6 +62,7 @@ contract Jackpot is VRFConsumerBase, Ownable {
         colorsNFT = new ColorsNFT(colorModifiersAddress, address(this));
         colorsNFTAddress = address(colorsNFT);
         lottery_state = LOTTERY_STATE.OPEN;
+
         startLottery();
     }
 
@@ -105,12 +106,32 @@ contract Jackpot is VRFConsumerBase, Ownable {
 
     function endLottery() public {
         require(block.timestamp >= deadline, "Countdown has not finished!");
-
-        if (colorsNFT.totalSupply() > 0) {
-            lottery_state = LOTTERY_STATE.CALCULATING_WINNER;
-            requestId = getRandomNumber();
+        // Rinkeby chainid
+        if (block.chainid == 4) {
+            if (colorsNFT.totalSupply() > 0) {
+                lottery_state = LOTTERY_STATE.CALCULATING_WINNER;
+                requestId = getRandomNumber();
+            } else {
+                lottery_state = LOTTERY_STATE.CLOSED;
+            }
         } else {
-            lottery_state = LOTTERY_STATE.CLOSED;
+            if (colorsNFT.totalSupply() > 0) {
+                lottery_state = LOTTERY_STATE.CALCULATING_WINNER;
+
+                uint256 randomNumber = uint256(
+                    keccak256(
+                        abi.encodePacked(
+                            block.difficulty,
+                            block.timestamp,
+                            colorsNFT.totalSupply()
+                        )
+                    )
+                ) % (2**24);
+
+                distributeWinnings(randomNumber);
+            } else {
+                lottery_state = LOTTERY_STATE.CLOSED;
+            }
         }
     }
 
