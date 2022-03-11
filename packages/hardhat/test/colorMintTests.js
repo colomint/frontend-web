@@ -56,8 +56,7 @@ describe("Tests ColoMint", function () {
         expect(count.length).to.equal(2);
       });
 
-      it("Should start the lottery", async function () {
-        await jackpotContract.startLottery();
+      it("Should start the lottery after being deployed", async function () {
 
         const lotteryStatus = 0; // OPEN
 
