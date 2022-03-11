@@ -71,27 +71,44 @@ const modalHandle = () => {
                <h2>Connected Wallet: {address && <Address address={address} ensProvider={mainnetProvider} />} </h2>
                {/* <h2>MATIC Balance: <Balance address={address} provider={localProvider} price={price} /> </h2> */}
                <h2>MATIC Balance: <TokenBalance/> </h2>
+               {/* get colomint balance */}
                <h2>ColoMint Balance:  </h2>
+               {/* paint bought */}
                <h2>Black Paint:  </h2>
+               {/* paint bought */}
                <h2>White Paint:  </h2>
-               <Button onClick={modalHandle}>
+            
+               <Button onClick={modalHandle} style={{ width: "auto", backgroundColor: "#95a8cc", fontSize: "20px", height: "auto", boxShadow: "2px 4px" }}>
                    Play the game of painting your NFT
                </Button>
                </div>
               
           </div>
 
-          <div>
+          <div style={{width: "300px", marginTop: "10px"}}>
 
           <img width="100%" height="200px" marginTop="10px" marginBottom="10px" src="" alt="" />
 
-          <div style={{ color: "white",  width: "200px", height: "140px", borderRadius: "8px", margin: "5px 0", padding: "12px", background: "red"}}>
+          <div style={{backgroundColor: "#bd99dc", marginTop: "16px", border: "1px solid #bd99dc", padding: "16px", borderRadius: "4px"}}>
+              {/* placeholder cost */}
+              <p style={{fontSize: "16px", textAlign: "left"}}>Cost:</p>
+              {/* trigger minting */}
+              <Button  style={{ width: "134px", backgroundColor: "#85cc85", fontSize: "20px", height: "auto", boxShadow:"2px 4px #3a553a9c", color: "black" }}  onClick={() => console.log("minting")}>
+                   Mint
+               </Button>
+          </div>
+
+
+
+            {/* get minted NFTS */}
+            
+          {/* <div style={{ color: "white",  width: "200px", height: "140px", borderRadius: "8px", margin: "5px 0", padding: "12px", background: "red"}}>
               NFT 1
           </div>
 
           <div style={{color: "white", width: "200px", height: "140px", borderRadius: "8px", margin: "5px 0", padding: "12px", background: "green"}}>
               NFT 2
-          </div>
+          </div> */}
 
               
           </div>
