@@ -7,7 +7,7 @@ import "hardhat/console.sol";
 
 contract ColorsNFT is ERC721, ERC1155Holder, Ownable {
     // ERC721 variables
-    uint256 public mintPrice = 0.00001 ether;
+    uint256 public mintPrice = 0.001 ether;
     uint256 public totalSupply;
     uint256 public maxSupply;
     bool public isMintEnabled = true;
@@ -62,7 +62,17 @@ contract ColorsNFT is ERC721, ERC1155Holder, Ownable {
         require(msg.value == mintPrice, "wrong value");
         require(maxSupply > totalSupply, "sold out");
 
-        mintInternal(uint256(keccak256(abi.encodePacked(block.difficulty, block.timestamp, totalSupply))) % (2**24));
+        mintInternal(
+            uint256(
+                keccak256(
+                    abi.encodePacked(
+                        block.difficulty,
+                        block.timestamp,
+                        totalSupply
+                    )
+                )
+            ) % (2**24)
+        );
 
         // send to jackpotwallet
         address payable jackpotWallet = payable(jackpotAddress);
@@ -71,7 +81,7 @@ contract ColorsNFT is ERC721, ERC1155Holder, Ownable {
     }
 
     // TODO make this private before going to production!
-    function mintInternal (uint256 rgbInt) public {
+    function mintInternal(uint256 rgbInt) public {
         mintedTokens[msg.sender]++;
         totalSupply++;
         uint256 tokenId = totalSupply;
@@ -153,9 +163,15 @@ contract ColorsNFT is ERC721, ERC1155Holder, Ownable {
         return rgb;
     }
 
-    function intToRgb(
-        uint256 color
-    ) public pure returns (uint256 r, uint256 g, uint256 b) {
+    function intToRgb(uint256 color)
+        public
+        pure
+        returns (
+            uint256 r,
+            uint256 g,
+            uint256 b
+        )
+    {
         uint256 _r = color / (256**2);
         uint256 _g = (color - _r * (256**2)) / 256;
         uint256 _b = color - _r * (256**2) - _g * 256;
@@ -163,21 +179,25 @@ contract ColorsNFT is ERC721, ERC1155Holder, Ownable {
         return (_r, _g, _b);
     }
 
-    function colorDistance(
-        uint256 colorOne,
-        uint256 colorTwo
-    ) public pure returns (uint256 distance) {
+    function colorDistance(uint256 colorOne, uint256 colorTwo)
+        public
+        pure
+        returns (uint256 distance)
+    {
         (uint256 rOne, uint256 gOne, uint256 bOne) = intToRgb(colorOne);
         (uint256 rTwo, uint256 gTwo, uint256 bTwo) = intToRgb(colorTwo);
-        uint256 _distance = absDiff(rOne, rTwo) + absDiff(gOne, gTwo) + absDiff(bOne, bTwo);
+        uint256 _distance = absDiff(rOne, rTwo) +
+            absDiff(gOne, gTwo) +
+            absDiff(bOne, bTwo);
 
         return _distance;
     }
 
-    function absDiff(
-        uint256 valueOne,
-        uint256 valueTwo
-    ) public pure returns (uint256 absValue) {
+    function absDiff(uint256 valueOne, uint256 valueTwo)
+        public
+        pure
+        returns (uint256 absValue)
+    {
         return valueOne >= valueTwo ? valueOne - valueTwo : valueTwo - valueOne;
     }
 

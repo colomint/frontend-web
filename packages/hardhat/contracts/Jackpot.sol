@@ -100,8 +100,7 @@ contract Jackpot is VRFConsumerBase, Ownable {
         if (colorsNFT.totalSupply() > 0) {
             lottery_state = LOTTERY_STATE.CALCULATING_WINNER;
             requestId = getRandomNumber();
-        }
-        else {
+        } else {
             lottery_state = LOTTERY_STATE.CLOSED;
         }
     }
@@ -128,17 +127,22 @@ contract Jackpot is VRFConsumerBase, Ownable {
         lottery_state = LOTTERY_STATE.CLOSED;
         winningColor = jackpotColor;
 
-        uint256 minDistance;
-        address payable[] memory winners = new address payable[](colorsNFT.totalSupply());
+        uint256 minDistance = 2**256 - 1;
+        address payable[] memory winners = new address payable[](
+            colorsNFT.totalSupply()
+        );
         uint256 numberWinners;
 
         uint256 currDistance;
-        for (uint256 i = 1; i <= colorsNFT.totalSupply(); i++) {
+        for (uint256 i = 0; i < colorsNFT.totalSupply(); i++) {
             if (colorsNFT.tokenToOwner(i) == address(0)) {
                 continue;
             }
 
-            currDistance = colorsNFT.colorDistance(winningColor, colorsNFT.tokenToColor(i));
+            currDistance = colorsNFT.colorDistance(
+                winningColor,
+                colorsNFT.tokenToColor(i)
+            );
             if (currDistance < minDistance) {
                 minDistance = currDistance;
                 winners[0] = colorsNFT.tokenToOwner(i);
@@ -149,10 +153,11 @@ contract Jackpot is VRFConsumerBase, Ownable {
             }
         }
 
-        for (uint256 i = 1; i < numberWinners; i++) {
+        uint256 amountToSend = (address(this).balance / numberWinners);
+        for (uint256 i = 0; i < numberWinners; i++) {
             // Use `send` to transfer money and ignore all errors. Otherwise, smart contracts entering into the lottery
             // and refusing to accept their winnings may block the system forever.
-            winners[i].send(address(this).balance / numberWinners);
+            winners[i].transfer(amountToSend);
         }
     }
 }
