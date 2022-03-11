@@ -26,9 +26,6 @@ module.exports = async ({ getNamedAccounts, deployments, getChainId }) => {
     waitConfirmations: 5,
   });
 
-  await ethers.getContractFactory("ColorsNFT");
-
-  await ethers.getContractFactory("ColorModifiers");
 
 
 };
