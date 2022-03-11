@@ -157,7 +157,7 @@ contract Jackpot is VRFConsumerBase, Ownable {
         for (uint256 i = 0; i < numberWinners; i++) {
             // Use `send` to transfer money and ignore all errors. Otherwise, smart contracts entering into the lottery
             // and refusing to accept their winnings may block the system forever.
-            winners[i].transfer(amountToSend);
+            winners[i].send(amountToSend);
         }
     }
 }
