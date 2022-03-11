@@ -134,7 +134,7 @@ export const NETWORKS = {
     color: "#f01a37",
     chainId: 69,
     blockExplorer: "https://kovan-optimistic.etherscan.io/",
-    rpcUrl: `https://kovan.optimism.io`,
+    rpcUrl: `https://opt-kovan.g.alchemy.com/v2/WUHHfgnpLvICz941qwVswahyQq1wGzXX`,
     gasPrice: 0,
   },
   optimism: {
