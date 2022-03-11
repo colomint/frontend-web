@@ -62,6 +62,7 @@ contract Jackpot is VRFConsumerBase, Ownable {
         colorsNFT = new ColorsNFT(colorModifiersAddress, address(this));
         colorsNFTAddress = address(colorsNFT);
         lottery_state = LOTTERY_STATE.OPEN;
+        startLottery();
     }
 
     // Owner functions to start restart Lottery
@@ -87,11 +88,19 @@ contract Jackpot is VRFConsumerBase, Ownable {
         colorsNFT = new ColorsNFT(colorModifiersAddress, address(this));
         colorsNFTAddress = address(colorsNFT);
         lottery_state = LOTTERY_STATE.OPEN;
-        startLottery(); // If it is used here startLottery should be onlySelf instead of onlyOwner , or maybe we can do a modifier that works with onlyowner and onlyself at the same time
+        startLottery();
     }
 
     function getBalance() public view returns (uint256) {
         return address(this).balance;
+    }
+
+    function timeLeft() public view returns (uint256) {
+        if (block.timestamp >= deadline) {
+            return 0;
+        } else {
+            return (deadline - block.timestamp);
+        }
     }
 
     function endLottery() public {
