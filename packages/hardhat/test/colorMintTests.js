@@ -93,6 +93,60 @@ describe("Tests ColoMint", function () {
 
       });
 
+
+      it("Should restart lottery, end the lottery and have a winner", async function () {
+
+        const colorsNFTCFactory = await ethers.getContractFactory("ColorsNFT");
+        const colorModifiersFactory = await ethers.getContractFactory("ColorModifiers");
+
+        //restart lottery 
+
+        await jackpotContract.restartLottery();
+
+        colorModifierAddress = await jackpotContract.colorModifiersAddress();
+
+        colorsNFTAddress = await jackpotContract.colorsNFTAddress();
+
+        colorNFTContract = await colorsNFTCFactory.attach(colorsNFTAddress);
+        colorModifierContract = await colorModifiersFactory.attach(colorModifierAddress);
+
+        const tx1 = await colorNFTContract.connect(user2.signer).mint({
+          value: ethers.utils.parseEther("0.001")
+        })
+
+        const tx2 = await colorNFTContract.connect(user3.signer).mint({
+          value: ethers.utils.parseEther("0.001")
+        })
+
+        const balanceUser2Pre = await ethers.provider.getBalance(user2.address);
+        const balanceUser3Pre = await ethers.provider.getBalance(user3.address);
+
+
+        await network.provider.send("evm_increaseTime", [3600])
+        await jackpotContract.endLottery();
+
+
+        const balanceUser2Post = await ethers.provider.getBalance(user2.address);
+        const balanceUser3Post = await ethers.provider.getBalance(user3.address);
+
+        const winningsUser2 = ethers.utils.formatEther(
+          balanceUser2Post
+            .sub(balanceUser2Pre)
+        )
+
+
+        const winningsUser3 = ethers.utils.formatEther(
+          balanceUser3Post
+            .sub(balanceUser3Pre)
+        )
+
+        console.log(winningsUser3, winningsUser2)
+
+        expect(winningsUser2).to.not.equal(winningsUser3)
+
+
+      });
+
       it("User 3 should be the winner exact value ", async function () {
 
         const tx1 = await colorNFTContract.connect(user2.signer).mint({
