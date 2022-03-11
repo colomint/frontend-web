@@ -158,42 +158,44 @@ function App(props) {
   //
   // 🧫 DEBUG 👨🏻‍🔬
   //
-  useEffect(() => {
-    if (
-      DEBUG &&
-      mainnetProvider &&
-      address &&
-      selectedChainId &&
-      yourLocalBalance &&
-      yourMainnetBalance &&
-      readContracts &&
-      writeContracts &&
-      mainnetContracts
-    ) {
-      console.log("_____________________________________ 🏗 scaffold-eth _____________________________________");
-      console.log("🌎 mainnetProvider", mainnetProvider);
-      console.log("🏠 localChainId", localChainId);
-      console.log("👩‍💼 selected address:", address);
-      console.log("🕵🏻‍♂️ selectedChainId:", selectedChainId);
-      console.log("💵 yourLocalBalance", yourLocalBalance ? ethers.utils.formatEther(yourLocalBalance) : "...");
-      console.log("💵 yourMainnetBalance", yourMainnetBalance ? ethers.utils.formatEther(yourMainnetBalance) : "...");
-      console.log("📝 readContracts", readContracts);
-      console.log("🌍 DAI contract on mainnet:", mainnetContracts);
-      console.log("💵 yourMainnetDAIBalance", myMainnetDAIBalance);
-      console.log("🔐 writeContracts", writeContracts);
-    }
-  }, [
-    mainnetProvider,
-    address,
-    selectedChainId,
-    yourLocalBalance,
-    yourMainnetBalance,
-    readContracts,
-    writeContracts,
-    mainnetContracts,
-    localChainId,
-    myMainnetDAIBalance,
-  ]);
+
+  console.log("address", address);
+  // useEffect(() => {
+  //   if (
+  //     DEBUG &&
+  //     mainnetProvider &&
+  //     address &&
+  //     selectedChainId &&
+  //     yourLocalBalance &&
+  //     yourMainnetBalance &&
+  //     readContracts &&
+  //     writeContracts &&
+  //     mainnetContracts
+  //   ) {
+  //     console.log("_____________________________________ 🏗 scaffold-eth _____________________________________");
+  //     console.log("🌎 mainnetProvider", mainnetProvider);
+  //     console.log("🏠 localChainId", localChainId);
+  //     console.log("👩‍💼 selected address:", address);
+  //     console.log("🕵🏻‍♂️ selectedChainId:", selectedChainId);
+  //     console.log("💵 yourLocalBalance", yourLocalBalance ? ethers.utils.formatEther(yourLocalBalance) : "...");
+  //     console.log("💵 yourMainnetBalance", yourMainnetBalance ? ethers.utils.formatEther(yourMainnetBalance) : "...");
+  //     console.log("📝 readContracts", readContracts);
+  //     console.log("🌍 DAI contract on mainnet:", mainnetContracts);
+  //     console.log("💵 yourMainnetDAIBalance", myMainnetDAIBalance);
+  //     console.log("🔐 writeContracts", writeContracts);
+  //   }
+  // }, [
+  //   mainnetProvider,
+  //   address,
+  //   selectedChainId,
+  //   yourLocalBalance,
+  //   yourMainnetBalance,
+  //   readContracts,
+  //   writeContracts,
+  //   mainnetContracts,
+  //   localChainId,
+  //   myMainnetDAIBalance,
+  // ]);
 
   const loadWeb3Modal = useCallback(async () => {
     const provider = await web3Modal.connect();
@@ -229,7 +231,7 @@ function App(props) {
     <div className="App">
       <Switch>
         {/* TODO: after wallet is connected redirect to account page */}
-        <Route path="/account">
+        {/* <Route path="/account">
           <Lottery
             address={address}
             userSigner={userSigner}
@@ -242,10 +244,11 @@ function App(props) {
             readContracts={readContracts}
             purpose={purpose}
           />
-        </Route>
+        </Route> */}
       </Switch>
 
 
+      {!(web3Modal?.cachedProvider) ? 
       <div style={{ border: "1px solid #cccccc", padding: 16, margin: "auto", height: "100vh", backgroundBlendMode:"gradient", background:'url("Backgroud.jpeg")',backgroundRepeat:"no-repeat", backgroundSize:"cover",opacity:0.6  }}>
         <div style={{ margin: 40}}>
         <div style={{ color: "White", fontSize: "60px"}}>Welcome to ColoMint</div>
@@ -276,7 +279,25 @@ function App(props) {
           />
         </div>
       </div>
-      </div>
+      </div> 
+      :  
+       <Lottery
+       web3Modal={web3Modal}
+        address={address}
+        userSigner={userSigner}
+        loadWeb3Modal={loadWeb3Modal}
+        mainnetProvider={mainnetProvider}
+        localProvider={localProvider}
+        yourLocalBalance={yourLocalBalance}
+        logoutOfWeb3Modal={logoutOfWeb3Modal}
+        price={price}
+        tx={tx}
+        writeContracts={writeContracts}
+        readContracts={readContracts}
+        purpose={purpose}/>  
+         } 
+
+
     </div>
   );
 }
