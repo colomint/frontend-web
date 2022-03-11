@@ -7,14 +7,13 @@ import "hardhat/console.sol";
 
 contract ColorsNFT is ERC721, ERC1155Holder, Ownable {
     // ERC721 variables
-    uint256 public mintPrice = 0.00001 ether;
+    uint256 public mintPrice = 0.001 ether;
     uint256 public totalSupply;
     uint256 public maxSupply;
     bool public isMintEnabled = true;
     mapping(address => uint256) public mintedTokens;
 
     mapping(uint256 => uint256) public tokenToColor;
-    mapping(uint256 => uint256) public colorToToken;
 
     mapping(address => uint256[]) public ownerToTokens;
     mapping(uint256 => address payable) public tokenToOwner;
@@ -57,28 +56,38 @@ contract ColorsNFT is ERC721, ERC1155Holder, Ownable {
         maxSupply = maxSupply_;
     }
 
-    // Change this to random and then maintain this for test, when we are ready to deploy to testnet this
-    // function should be commented/ deleted
-    function mint(
-        uint256 _r,
-        uint256 _g,
-        uint256 _b
-    ) external payable {
+    function mint() external payable {
         require(isMintEnabled, "minting not enabled");
         require(mintedTokens[msg.sender] < 5, "exceeds max per wallet");
         require(msg.value == mintPrice, "wrong value");
         require(maxSupply > totalSupply, "sold out");
 
+        mintInternal(
+            uint256(
+                keccak256(
+                    abi.encodePacked(
+                        block.difficulty,
+                        block.timestamp,
+                        totalSupply
+                    )
+                )
+            ) % (2**24)
+        );
+
+        // send to jackpotwallet
+        address payable jackpotWallet = payable(jackpotAddress);
+        (bool success, ) = jackpotWallet.call{value: address(this).balance}("");
+        require(success, "Transfer to jackpot failed");
+    }
+
+    // TODO make this private before going to production!
+    function mintInternal(uint256 rgbInt) public {
         mintedTokens[msg.sender]++;
         totalSupply++;
         uint256 tokenId = totalSupply;
         _safeMint(msg.sender, tokenId);
 
-        //Color and Tokens relations
-        uint256 rgbInt = rgbToInt(_r, _g, _b);
-
         tokenToColor[tokenId - 1] = rgbInt;
-        colorToToken[rgbInt] = tokenId - 1;
 
         // owner and Tokens relations
         ownerToTokens[msg.sender].push(tokenId - 1);
@@ -86,10 +95,6 @@ contract ColorsNFT is ERC721, ERC1155Holder, Ownable {
 
         // list of nfts with their colors
         colorTokenList.push(rgbInt);
-        // send to jackpotwallet
-        address payable jackpotWallet = payable(jackpotAddress);
-        (bool success, ) = jackpotWallet.call{value: address(this).balance}("");
-        require(success, "Transfer to jackpot failed");
     }
 
     function supportsInterface(bytes4 interfaceId)
@@ -152,10 +157,48 @@ contract ColorsNFT is ERC721, ERC1155Holder, Ownable {
         uint256 _r,
         uint256 _g,
         uint256 _b
-    ) internal pure returns (uint256) {
+    ) public pure returns (uint256) {
         uint256 rgb = 256**2 * _r + 256 * _g + _b; // Transform RGB into uint256
 
         return rgb;
+    }
+
+    function intToRgb(uint256 color)
+        public
+        pure
+        returns (
+            uint256 r,
+            uint256 g,
+            uint256 b
+        )
+    {
+        uint256 _r = color / (256**2);
+        uint256 _g = (color - _r * (256**2)) / 256;
+        uint256 _b = color - _r * (256**2) - _g * 256;
+
+        return (_r, _g, _b);
+    }
+
+    function colorDistance(uint256 colorOne, uint256 colorTwo)
+        public
+        pure
+        returns (uint256 distance)
+    {
+        (uint256 rOne, uint256 gOne, uint256 bOne) = intToRgb(colorOne);
+        (uint256 rTwo, uint256 gTwo, uint256 bTwo) = intToRgb(colorTwo);
+        uint256 _distance = absDiff(rOne, rTwo) +
+            absDiff(gOne, gTwo) +
+            absDiff(bOne, bTwo);
+
+        return _distance;
+    }
+
+    function absDiff(uint256 valueOne, uint256 valueTwo)
+        public
+        pure
+        returns (uint256 absValue)
+    {
+        return valueOne >= valueTwo ? valueOne - valueTwo : valueTwo - valueOne;
     }
 
     function getColorsByOwner(address _owner)

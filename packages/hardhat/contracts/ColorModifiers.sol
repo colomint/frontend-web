@@ -51,27 +51,26 @@ contract ColorModifiers is ERC1155, Ownable {
 
     // this one costs and sends money to jackpotAddress
 
-    function mintPayable(uint256 tokenId) external payable {
+    function mintPayable(uint256 tokenId, uint256 amount) external payable {
         // make it payable
-        require(msg.value == mintPrice, "wrong value");
-        _mint(msg.sender, tokenId, 1, "");
+        require(msg.value == mintPrice * amount, "wrong value");
+        _mint(msg.sender, tokenId, amount, "");
         address payable jackpotWallet = payable(jackpotAddress);
         (bool success, ) = jackpotWallet.call{value: address(this).balance}("");
         require(success, "Transfer to jackpot");
         // jackpotWallet.transfer(address(this).balance);
     }
 
-    function mint () external payable {
-                      require (isMintEnabled, "minting not enabled");
-                      require(mintedWallets[msg.sender] < 2, "exceeds max per wallet");
-                      require(msg.value == mintPrice, "wrong value");
-                      require(maxSupply > totalSupply, "sold out");
+    //     function mint () external payable {
+    //                       require (isMintEnabled, "minting not enabled");
+    //                       require(mintedWallets[msg.sender] < 2, "exceeds max per wallet");
+    //                       require(msg.value == mintPrice, "wrong value");
+    //                       require(maxSupply > totalSupply, "sold out");
 
-                      mintedWallets[msg.sender]++;
-                      totalSupply++;
-                      uint256 tokenId = totalSupply;
-                      _safeMint(msg.sender, tokenId);
-     
-    
-   }
+    //                       mintedWallets[msg.sender]++;
+    //                       totalSupply++;
+    //                       uint256 tokenId = totalSupply;
+    //                       _safeMint(msg.sender, tokenId);
+
+    //    }
 }

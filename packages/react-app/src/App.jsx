@@ -1,4 +1,3 @@
-import { Button, Col, Menu, Row } from "antd";
 import "antd/dist/antd.css";
 import {
   useBalance,
@@ -10,17 +9,10 @@ import {
 } from "eth-hooks";
 import { useExchangeEthPrice } from "eth-hooks/dapps/dex";
 import React, { useCallback, useEffect, useState } from "react";
-import { Link, Route, Switch, useLocation } from "react-router-dom";
+import { Switch, useLocation } from "react-router-dom";
 import "./App.css";
 import {
   Account,
-  // Contract,
-  // Faucet,
-  // GasGauge,
-  // Header,
-  // Ramp,
-  // NetworkDisplay,
-  // FaucetHint,
   NetworkSwitch,
 } from "./components";
 import { NETWORKS, ALCHEMY_KEY } from "./constants";
@@ -31,10 +23,20 @@ import { Transactor, Web3ModalSetup } from "./helpers";
 import { Lottery } from "./views";
 import { useStaticJsonRPC } from "./hooks";
 
+
+// import ColorsNFT from "./contracts/ColorsNFT.json";
+// import ColorsModifiers from "./contracts/ColorModifiers.json";
+// import { Contract as ContractEthers } from "@ethersproject/contracts";
+import { useEthers, useContractFunction, DAppProvider, Rinkeby } from "@usedapp/core"
+import { constants, utils } from "ethers"
+
+
+////
+
 const { ethers } = require("ethers");
 
 /// 📡 What chain are your contracts deployed to?
-const initialNetwork = NETWORKS.localhost; // <------- select your target frontend network (localhost, rinkeby, xdai, mainnet)
+const initialNetwork = NETWORKS.rinkeby; // <------- select your target frontend network (localhost, rinkeby, xdai, mainnet)
 
 // 😬 Sorry for all the console logging
 const DEBUG = true;
@@ -43,6 +45,7 @@ const USE_BURNER_WALLET = true; // toggle burner wallet feature
 const USE_NETWORK_SELECTOR = false;
 
 const web3Modal = Web3ModalSetup();
+
 
 // 🛰 providers
 const providers = [
@@ -72,10 +75,8 @@ function App(props) {
   ]);
   const mainnetProvider = useStaticJsonRPC(providers);
 
-  if (DEBUG) console.log(`Using ${selectedNetwork} network`);
 
   // 🛰 providers
-  if (DEBUG) console.log("📡 Connecting to Mainnet Ethereum");
 
   const logoutOfWeb3Modal = async () => {
     await web3Modal.clearCachedProvider();
@@ -96,6 +97,7 @@ function App(props) {
   const userProviderAndSigner = useUserProviderAndSigner(injectedProvider, localProvider, USE_BURNER_WALLET);
   const userSigner = userProviderAndSigner.signer;
 
+
   useEffect(() => {
     async function getAddress() {
       if (userSigner) {
@@ -105,6 +107,8 @@ function App(props) {
     }
     getAddress();
   }, [userSigner]);
+
+
 
   // You can warn the user if you would like them to be on a specific network
   const localChainId = localProvider && localProvider._network && localProvider._network.chainId;
@@ -126,6 +130,7 @@ function App(props) {
 
   const contractConfig = { deployedContracts: deployedContracts || {}, externalContracts: externalContracts || {} };
 
+
   // Load in your local 📝 contract and read a value from it:
   const readContracts = useContractLoader(localProvider, contractConfig);
 
@@ -135,67 +140,74 @@ function App(props) {
   // EXTERNAL CONTRACT EXAMPLE:
   //
   // If you want to bring in the mainnet DAI contract it would look like:
-  const mainnetContracts = useContractLoader(mainnetProvider, contractConfig);
+  // const mainnetContracts = useContractLoader(mainnetProvider, contractConfig);
 
   // If you want to call a function on a new block
   useOnBlock(mainnetProvider, () => {
     console.log(`⛓ A new mainnet block is here: ${mainnetProvider._lastBlockNumber}`);
   });
 
-  // Then read your DAI balance like:
-  const myMainnetDAIBalance = useContractReader(mainnetContracts, "DAI", "balanceOf", [
-    "0x34aA3F359A9D614239015126635CE7732c18fDF3",
-  ]);
 
-  // keep track of a variable from the contract in the local React state:
-  const purpose = useContractReader(readContracts, "YourContract", "purpose");
+  // // keep track of a variable from the contract in the local React state:
+  // const purpose = useContractReader(readContracts, "YourContract", "randomHash");
+  // // keep track of white paint
+  // const whitePaint = useContractReader(readContracts, "ColorsNFT", "balanceOf");
+  // console.log("whitePaint", whitePaint);
+  // // dark paint
+  // const darkPaint = useContractReader(readContracts, "ColorModifiers", "balanceOf", ["0x990Ae48efDD87Ba85dEf8fb6633d0B7155539720", 0]);
+
+  // const darkPaint = useContractReader(readContracts, "ColorModifiers", "getBalanceDarkPaint", [
+  //   address,
+  // ]);
+
+
+  // const whitePaint = useContractReader(readContracts, "ColorModifiers", "getBalanceWhitePaint", [address]);
+
+
+  // const listOfTokensPerUser = useContractReader(readContracts, "ColorsNFT", "getColorsByOwner", [address,]);
+
+  // const colorTokenList = useContractReader(readContracts, "ColorsNFT", "_colorTokenList");
+
+  // console.log(colorTokenList);
+  // const userTables = 0;
+
+  ///// 
+  // const colorModifiersAddress = useContractReader(readContracts, "Jackpot", "colorModifiersAddress");
+
+  // const colorsNFTAddress = useContractReader(readContracts, "Jackpot", "colorsNFTAddress");
+  // console.log(colorsNFTAddress);
+  const purpose = "tt";
+  // const ColorsModifiersABI = ColorsModifiers.abi;
+
+
+  // const ColorsModifiersInterface = new utils.Interface(ColorsModifiersABI);
+  // let colorModifiersContract
+  // if (colorModifiersAddress) {
+  //   colorModifiersContract = new ContractEthers(colorModifiersAddress, ColorsModifiersInterface, userSigner)
+  // }
+
+  // const ColorsNFTABI = ColorsNFT.abi;
+
+  // const ColorsNFTInterface = new utils.Interface(ColorsNFTABI);
+  // let colorNFTContract
+  // if (colorsNFTAddress) {
+  //   colorNFTContract = new ContractEthers(colorsNFTAddress, ColorsNFTInterface, userSigner)
+  // }
+
+
+
+
+  // const darkPaint = readContracts["ColorModifiers"]?.balanceOf("0x990Ae48efDD87Ba85dEf8fb6633d0B7155539720", 0);
+
+
+  // const whitePaint = readContracts["ColorModifiers"]?.balanceOf("0x990Ae48efDD87Ba85dEf8fb6633d0B7155539720", 1);
+
 
   /*
   const addressFromENS = useResolveName(mainnetProvider, "austingriffith.eth");
   console.log("🏷 Resolved austingriffith.eth as:",addressFromENS)
   */
 
-  //
-  // 🧫 DEBUG 👨🏻‍🔬
-  //
-
-  console.log("address", address);
-  // useEffect(() => {
-  //   if (
-  //     DEBUG &&
-  //     mainnetProvider &&
-  //     address &&
-  //     selectedChainId &&
-  //     yourLocalBalance &&
-  //     yourMainnetBalance &&
-  //     readContracts &&
-  //     writeContracts &&
-  //     mainnetContracts
-  //   ) {
-  //     console.log("_____________________________________ 🏗 scaffold-eth _____________________________________");
-  //     console.log("🌎 mainnetProvider", mainnetProvider);
-  //     console.log("🏠 localChainId", localChainId);
-  //     console.log("👩‍💼 selected address:", address);
-  //     console.log("🕵🏻‍♂️ selectedChainId:", selectedChainId);
-  //     console.log("💵 yourLocalBalance", yourLocalBalance ? ethers.utils.formatEther(yourLocalBalance) : "...");
-  //     console.log("💵 yourMainnetBalance", yourMainnetBalance ? ethers.utils.formatEther(yourMainnetBalance) : "...");
-  //     console.log("📝 readContracts", readContracts);
-  //     console.log("🌍 DAI contract on mainnet:", mainnetContracts);
-  //     console.log("💵 yourMainnetDAIBalance", myMainnetDAIBalance);
-  //     console.log("🔐 writeContracts", writeContracts);
-  //   }
-  // }, [
-  //   mainnetProvider,
-  //   address,
-  //   selectedChainId,
-  //   yourLocalBalance,
-  //   yourMainnetBalance,
-  //   readContracts,
-  //   writeContracts,
-  //   mainnetContracts,
-  //   localChainId,
-  //   myMainnetDAIBalance,
-  // ]);
 
   const loadWeb3Modal = useCallback(async () => {
     const provider = await web3Modal.connect();
@@ -215,6 +227,7 @@ function App(props) {
     provider.on("disconnect", (code, reason) => {
       console.log(code, reason);
       logoutOfWeb3Modal();
+
     });
     // eslint-disable-next-line
   }, [setInjectedProvider]);
@@ -227,12 +240,27 @@ function App(props) {
 
   // const faucetAvailable = localProvider && localProvider.connection && targetNetwork.name.indexOf("local") !== -1;
 
+  /// userdapp 
+
+
+  const { activateBrowserWallet, deactivate, account } = useEthers()
+  ///
+console.log(account,"account");
+
+
+  useEffect(() => {
+    if (userSigner) {
+      activateBrowserWallet();
+    }
+  }, [activateBrowserWallet, userSigner]);
+
+
   return (
+
     <div className="App">
       <Switch>
-        {/* TODO: after wallet is connected redirect to account page */}
-        {/* <Route path="/account">
-          <Lottery
+      {/* <Route path="/exampleui">
+          <BuyAndModifyColor
             address={address}
             userSigner={userSigner}
             mainnetProvider={mainnetProvider}
@@ -243,12 +271,21 @@ function App(props) {
             writeContracts={writeContracts}
             readContracts={readContracts}
             purpose={purpose}
+            whitePaint={whitePaint}
+            darkPaint={darkPaint}
+            userTables={userTables}
+            listOfTokensPerUser={listOfTokensPerUser}
+            colorTokenList={colorTokenList}
+            colorModifiersContract={colorModifiersContract}
+            colorModifiersAddress={colorModifiersAddress}
+            colorNFTContract={colorNFTContract}
+            colorsNFTAddress={colorsNFTAddress}
           />
-        </Route> */}
+        </Route>  */}
       </Switch>
 
 
-      {!(web3Modal?.cachedProvider) ? 
+      {!(web3Modal.cachedProvider) ? 
       <div style={{ border: "1px solid #cccccc", padding: 16, margin: "auto", height: "100vh", backgroundBlendMode:"gradient", background:'url("Backgroud.jpeg")',backgroundRepeat:"no-repeat", backgroundSize:"cover",opacity:0.6  }}>
         <div style={{ margin: 40}}>
         <div style={{ color: "White", fontSize: "60px"}}>Welcome to ColoMint</div>
