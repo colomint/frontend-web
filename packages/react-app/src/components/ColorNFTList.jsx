@@ -23,7 +23,6 @@ export default function ColorNFTList({ address, colorNFTContract }) {
   const nftList = useNFTList(colorNFTContract, address);
 
   useEffect(() => {
-    nftList && console.log("NFT list", nftList[0]);
     nftList && setNftIds(nftList[0].map(entry => entry["_hex"]));
   }, [nftList]);
 

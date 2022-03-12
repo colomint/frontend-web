@@ -5,7 +5,6 @@ export default function ColorNFT({ tokenId, colorNFTContract }) {
     const _r = Math.floor(intRgb / 256 ** 2);
     const _g = Math.floor((intRgb - _r * 256 ** 2) / 256);
     const _b = intRgb - _r * 256 ** 2 - _g * 256;
-    console.log(_r, _g, _b);
 
     return _r.toString(16) + _g.toString(16) + _b.toString(16);
   }
@@ -23,7 +22,6 @@ export default function ColorNFT({ tokenId, colorNFTContract }) {
       console.error(error.message);
       return undefined;
     }
-    value && console.log("smart contract value", value);
     return value ? intRgbToHex(parseInt(value[0]["_hex"], 16)) : undefined;
   }
 

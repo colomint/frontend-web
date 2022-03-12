@@ -195,7 +195,6 @@ function App(props) {
   if (colorsNFTAddress) {
     colorNFTContract = new ContractEthers(colorsNFTAddress, ColorsNFTInterface, userSigner);
   }
-  console.log("colorNFTContract", colorNFTContract);
 
   const jackPotBalance = useContractReader(readContracts, "Jackpot", "getBalance")
 
