@@ -30,7 +30,6 @@ import { useStaticJsonRPC } from "./hooks";
 import { useEthers, useContractFunction, DAppProvider, Rinkeby } from "@usedapp/core"
 import { constants, utils } from "ethers"
 
-console.log(Provider)
 
 
 ////
@@ -247,7 +246,7 @@ function App(props) {
 
   const { activateBrowserWallet, deactivate, account } = useEthers()
   ///
-console.log(account,"account");
+  console.log(account, "account");
 
 
   useEffect(() => {
@@ -261,7 +260,7 @@ console.log(account,"account");
 
     <div className="App">
       <Switch>
-      {/* <Route path="/exampleui">
+        {/* <Route path="/exampleui">
           <BuyAndModifyColor
             address={address}
             userSigner={userSigner}
@@ -287,54 +286,54 @@ console.log(account,"account");
       </Switch>
 
 
-      {!(web3Modal.cachedProvider) ? 
-      <div style={{ border: "1px solid #cccccc", padding: 16, margin: "auto", height: "100vh", backgroundBlendMode:"gradient", background:'url("Backgroud.jpeg")',backgroundRepeat:"no-repeat", backgroundSize:"cover",opacity:0.6  }}>
-        <div style={{ margin: 40}}>
-        <div style={{ color: "White", fontSize: "60px"}}>Welcome to ColoMint</div>
-        <div style={{ color: "White", fontSize: "36px"}}>A JackPot that will always have a winner</div>
-        <h4 style={{ color: "White", fontSize: "64px"}}>MinT it 2 Win iT</h4>
-        {/* <div style={{padding: 10 }}> */}
-        <div style={{ display: "flex", justifyContent: "center", alignItems: "center" }}>
-          {USE_NETWORK_SELECTOR && (
-            <div style={{ marginRight: 20 }}>
-              <NetworkSwitch
-                networkOptions={networkOptions}
-                selectedNetwork={selectedNetwork}
-                setSelectedNetwork={setSelectedNetwork}
+      {!(web3Modal.cachedProvider) ?
+        <div style={{ border: "1px solid #cccccc", padding: 16, margin: "auto", height: "100vh", backgroundBlendMode: "gradient", background: 'url("Backgroud.jpeg")', backgroundRepeat: "no-repeat", backgroundSize: "cover", opacity: 0.6 }}>
+          <div style={{ margin: 40 }}>
+            <div style={{ color: "White", fontSize: "60px" }}>Welcome to ColoMint</div>
+            <div style={{ color: "White", fontSize: "36px" }}>A JackPot that will always have a winner</div>
+            <h4 style={{ color: "White", fontSize: "64px" }}>MinT it 2 Win iT</h4>
+            {/* <div style={{padding: 10 }}> */}
+            <div style={{ display: "flex", justifyContent: "center", alignItems: "center" }}>
+              {USE_NETWORK_SELECTOR && (
+                <div style={{ marginRight: 20 }}>
+                  <NetworkSwitch
+                    networkOptions={networkOptions}
+                    selectedNetwork={selectedNetwork}
+                    setSelectedNetwork={setSelectedNetwork}
+                  />
+                </div>
+              )}
+              <Account
+                useBurner={USE_BURNER_WALLET}
+                address={address}
+                localProvider={localProvider}
+                userSigner={userSigner}
+                mainnetProvider={mainnetProvider}
+                price={price}
+                web3Modal={web3Modal}
+                loadWeb3Modal={loadWeb3Modal}
+                logoutOfWeb3Modal={logoutOfWeb3Modal}
+                blockExplorer={blockExplorer}
               />
             </div>
-          )}
-          <Account
-            useBurner={USE_BURNER_WALLET}
-            address={address}
-            localProvider={localProvider}
-            userSigner={userSigner}
-            mainnetProvider={mainnetProvider}
-            price={price}
-            web3Modal={web3Modal}
-            loadWeb3Modal={loadWeb3Modal}
-            logoutOfWeb3Modal={logoutOfWeb3Modal}
-            blockExplorer={blockExplorer}
-          />
+          </div>
         </div>
-      </div>
-      </div> 
-      :  
-       <Lottery
-       web3Modal={web3Modal}
-        address={address}
-        userSigner={userSigner}
-        loadWeb3Modal={loadWeb3Modal}
-        mainnetProvider={mainnetProvider}
-        localProvider={localProvider}
-        yourLocalBalance={yourLocalBalance}
-        logoutOfWeb3Modal={logoutOfWeb3Modal}
-        price={price}
-        tx={tx}
-        writeContracts={writeContracts}
-        readContracts={readContracts}
-        purpose={purpose}/>  
-         } 
+        :
+        <Lottery
+          web3Modal={web3Modal}
+          address={address}
+          userSigner={userSigner}
+          loadWeb3Modal={loadWeb3Modal}
+          mainnetProvider={mainnetProvider}
+          localProvider={localProvider}
+          yourLocalBalance={yourLocalBalance}
+          logoutOfWeb3Modal={logoutOfWeb3Modal}
+          price={price}
+          tx={tx}
+          writeContracts={writeContracts}
+          readContracts={readContracts}
+          purpose={purpose} />
+      }
 
 
     </div>
