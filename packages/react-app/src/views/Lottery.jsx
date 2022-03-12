@@ -54,7 +54,7 @@ export default function Lottery({
   function useTotalDarkPaint() {
     const { value, error } = useCall(colorModifiersAddress && {
       contract: colorModifiersContract,
-      method: 'getBalanceWhitePaint',
+      method: 'getBalanceDarkPaint',
       args: [address],
     }) ?? {}
     if (error) {
