@@ -24,9 +24,9 @@ import { Lottery } from "./views";
 import { useStaticJsonRPC } from "./hooks";
 
 
-// import ColorsNFT from "./contracts/ColorsNFT.json";
-// import ColorsModifiers from "./contracts/ColorModifiers.json";
-// import { Contract as ContractEthers } from "@ethersproject/contracts";
+import ColorsNFT from "./contracts/ColorsNFT.json";
+import ColorsModifiers from "./contracts/ColorModifiers.json";
+import { Contract as ContractEthers } from "@ethersproject/contracts";
 import { useEthers, useContractFunction, DAppProvider, Rinkeby } from "@usedapp/core"
 import { constants, utils } from "ethers"
 
@@ -173,27 +173,29 @@ function App(props) {
   // const userTables = 0;
 
   ///// 
-  // const colorModifiersAddress = useContractReader(readContracts, "Jackpot", "colorModifiersAddress");
-
-  // const colorsNFTAddress = useContractReader(readContracts, "Jackpot", "colorsNFTAddress");
-  // console.log(colorsNFTAddress);
-  const purpose = "tt";
-  // const ColorsModifiersABI = ColorsModifiers.abi;
+  const colorModifiersAddress = useContractReader(readContracts, "Jackpot", "colorModifiersAddress");
 
 
-  // const ColorsModifiersInterface = new utils.Interface(ColorsModifiersABI);
-  // let colorModifiersContract
-  // if (colorModifiersAddress) {
-  //   colorModifiersContract = new ContractEthers(colorModifiersAddress, ColorsModifiersInterface, userSigner)
-  // }
 
-  // const ColorsNFTABI = ColorsNFT.abi;
+  const colorsNFTAddress = useContractReader(readContracts, "Jackpot", "colorsNFTAddress");
+  const ColorsModifiersABI = ColorsModifiers.abi;
 
-  // const ColorsNFTInterface = new utils.Interface(ColorsNFTABI);
-  // let colorNFTContract
-  // if (colorsNFTAddress) {
-  //   colorNFTContract = new ContractEthers(colorsNFTAddress, ColorsNFTInterface, userSigner)
-  // }
+
+  const ColorsModifiersInterface = new utils.Interface(ColorsModifiersABI);
+  let colorModifiersContract
+  if (colorModifiersAddress) {
+    colorModifiersContract = new ContractEthers(colorModifiersAddress, ColorsModifiersInterface, userSigner)
+  }
+
+  const ColorsNFTABI = ColorsNFT.abi;
+
+  const ColorsNFTInterface = new utils.Interface(ColorsNFTABI);
+  let colorNFTContract
+  if (colorsNFTAddress) {
+    colorNFTContract = new ContractEthers(colorsNFTAddress, ColorsNFTInterface, userSigner)
+  }
+
+  console.log(colorsNFTAddress, colorModifiersAddress);
 
 
 
@@ -331,8 +333,7 @@ function App(props) {
           price={price}
           tx={tx}
           writeContracts={writeContracts}
-          readContracts={readContracts}
-          purpose={purpose} />
+          readContracts={readContracts} />
       }
 
 
