@@ -6,7 +6,11 @@ export default function ColorNFT({ tokenId, colorNFTContract, colorModifiersCont
     const _g = Math.floor((intRgb - _r * 256 ** 2) / 256);
     const _b = intRgb - _r * 256 ** 2 - _g * 256;
 
-    return _r.toString(16) + _g.toString(16) + _b.toString(16);
+    return padString(_r.toString(16)) + padString(_g.toString(16)) + padString(_b.toString(16));
+  }
+
+  function padString(str) {
+    return str.length === 1 ? "0" + str : str;
   }
 
   function useTokenToColor(tokenContract, _tokenId) {

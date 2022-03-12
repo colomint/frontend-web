@@ -58,7 +58,7 @@ const providers = [
 function App(props) {
   // specify all the chains your app is available on. Eg: ['localhost', 'mainnet', ...otherNetworks ]
   // reference './constants.js' for other networks
-  const networkOptions = [initialNetwork.name, "mainnet", "rinkeby"];
+  const networkOptions = [initialNetwork.name, "rinkeby", "kovanOptimism"];
 
   const [injectedProvider, setInjectedProvider] = useState();
   const [address, setAddress] = useState();
@@ -299,8 +299,8 @@ function App(props) {
       {!(web3Modal.cachedProvider) ?
         <div style={{ border: "1px solid #cccccc", padding: 16, margin: "auto", height: "100vh", backgroundBlendMode: "gradient", background: 'url("Backgroud.jpeg")', backgroundRepeat: "no-repeat", backgroundSize: "cover", opacity: 0.6 }}>
           <div style={{ margin: 40 }}>
-            <div style={{ color: "White", fontSize: "60px" }}>Welcome to ColoMint</div>
-            <div style={{ color: "White", fontSize: "36px" }}>A JackPot that will always have a winner</div>
+            <div style={{ color: "black", fontSize: "60px" }}>Welcome to ColoMint</div>
+            <div style={{ color: "blue", fontSize: "36px" }}>A JackPot that will always have a winner</div>
             <h4 style={{ color: "White", fontSize: "64px" }}>MinT it 2 Win iT</h4>
             {/* <div style={{padding: 10 }}> */}
             <div style={{ display: "flex", justifyContent: "center", alignItems: "center" }}>

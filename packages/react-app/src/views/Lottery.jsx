@@ -124,12 +124,6 @@ export default function Lottery({
             </p>
 
             <h3 style={{ fontFamily: "sans-serif", color: "white", fontSize: "20px" }}>Every Jackpot has a WINNER</h3>
-
-            <div style={{ backgroundColor: "black", color: "yellow", height: "90px", borderRadius: "12px", padding: "5px", width: "70%", margin: "auto" }}>
-              {/* placeholder amount */}
-              <p>JOIN DRAW : #331 </p>
-
-            </div>
           </div>
 
           <div style={{ border: "1px solid grey", borderRadius: "10px", marginTop: "15px", padding: "12px", background: "#1918185c" }}>
@@ -141,9 +135,9 @@ export default function Lottery({
             {/* paint bought */}
             <h2>White Paint: {TotalWhitePaintInt} </h2>
 
-            <Button onClick={modalHandle} style={{ width: "auto", backgroundColor: "#95a8cc", fontSize: "20px", height: "auto", boxShadow: "2px 4px" }}>
+            {/* <Button onClick={modalHandle} style={{ width: "auto", backgroundColor: "#95a8cc", fontSize: "20px", height: "auto", boxShadow: "2px 4px" }}>
               Play the game of painting your NFT
-            </Button>
+            </Button> */}
           </div>
 
         </div>
