@@ -4,7 +4,8 @@ import React, { useState } from "react";
 // import { SyncOutlined } from "@ant-design/icons";
 
 import { Account, Address, Balance, TokenBalance } from "../components";
-
+import { useContractFunction, useCall } from "@usedapp/core";
+import { ethers } from "ethers";
 export default function Lottery({
   address,
   mainnetProvider,
@@ -18,6 +19,12 @@ export default function Lottery({
   tx,
   readContracts,
   writeContracts,
+  jackPotBalance,
+  colorModifiersAddress,
+  colorModifiersContract,
+  colorNFTContract,
+  colorsNFTAddress
+
 }) {
   //   const [newPurpose, setNewPurpose] = useState("loading...");
 
@@ -30,6 +37,16 @@ export default function Lottery({
   const handleCancel = () => {
     setShowModal(false);
   };
+
+  const { send: mintERC721Send } = useContractFunction(colorNFTContract, "mint")
+
+
+  function mintERC721() {
+    console.log("test");
+    let valueInEther = ethers.utils.parseEther("" + 0.001);
+    return mintERC721Send({ value: valueInEther });
+  }
+
 
   return (
     <div style={{ border: "1px solid #cccccc", padding: 16, margin: "auto", height: "100vh", backgroundBlendMode: "gradient", background: 'url("Backgroud.jpeg")', backgroundRepeat: "no-repeat", backgroundSize: "cover", }}>
@@ -55,7 +72,14 @@ export default function Lottery({
 
             <h1 style={{ fontFamily: "cursive", fontSize: "30px" }}>Today's Jackpot</h1>
             {/* placeholder amount */}
-            <p style={{ fontFamily: "fantasy", fontSize: "56px", marginBottom: "5px" }}>$25,000</p>
+            <p style={{ fontFamily: "fantasy", fontSize: "56px", marginBottom: "5px" }}>
+
+              <Balance
+                balance={jackPotBalance}
+                price={price}
+              />
+
+            </p>
 
             <h3 style={{ fontFamily: "sans-serif", color: "white", fontSize: "20px" }}>Every Jackpot has a WINNER</h3>
 
@@ -92,7 +116,7 @@ export default function Lottery({
             {/* placeholder cost */}
             <p style={{ fontSize: "16px", textAlign: "left" }}>Cost:</p>
             {/* trigger minting */}
-            <Button style={{ width: "134px", backgroundColor: "#85cc85", fontSize: "20px", height: "auto", boxShadow: "2px 4px #3a553a9c", color: "black" }} onClick={() => console.log("minting")}>
+            <Button style={{ width: "134px", backgroundColor: "#85cc85", fontSize: "20px", height: "auto", boxShadow: "2px 4px #3a553a9c", color: "black" }} onClick={mintERC721}>
               Mint
             </Button>
           </div>

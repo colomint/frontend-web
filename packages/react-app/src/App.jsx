@@ -99,6 +99,7 @@ function App(props) {
   const userSigner = userProviderAndSigner.signer;
 
 
+
   useEffect(() => {
     async function getAddress() {
       if (userSigner) {
@@ -195,7 +196,14 @@ function App(props) {
     colorNFTContract = new ContractEthers(colorsNFTAddress, ColorsNFTInterface, userSigner)
   }
 
+  const jackPotBalance = useContractReader(readContracts, "Jackpot", "getBalance")
+
   console.log(colorsNFTAddress, colorModifiersAddress);
+  console.log(jackPotBalance);
+
+
+
+
 
 
 
@@ -333,7 +341,12 @@ function App(props) {
           price={price}
           tx={tx}
           writeContracts={writeContracts}
-          readContracts={readContracts} />
+          readContracts={readContracts}
+          jackPotBalance={jackPotBalance}
+          colorModifiersContract={colorModifiersContract}
+          colorModifiersAddress={colorModifiersAddress}
+          colorNFTContract={colorNFTContract}
+          colorsNFTAddress={colorsNFTAddress} />
       }
 
 
