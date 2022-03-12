@@ -18,7 +18,7 @@ function useNFTList(tokenContract, address) {
   return value;
 }
 
-export default function ColorNFTList({ address, colorNFTContract }) {
+export default function ColorNFTList({ address, colorNFTContract, colorModifiersContract }) {
   const [nftIds, setNftIds] = useState([]);
   const nftList = useNFTList(colorNFTContract, address);
 
@@ -26,5 +26,13 @@ export default function ColorNFTList({ address, colorNFTContract }) {
     nftList && setNftIds(nftList[0].map(entry => entry["_hex"]));
   }, [nftList]);
 
-  return nftIds.map(entry => <ColorNFT tokenId={entry} colorNFTContract={colorNFTContract} key={entry} />);
+  return nftIds.map(entry => (
+    <ColorNFT
+      address={address}
+      tokenId={entry}
+      colorNFTContract={colorNFTContract}
+      colorModifiersContract={colorModifiersContract}
+      key={entry}
+    />
+  ));
 }

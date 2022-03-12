@@ -1,6 +1,6 @@
-import { useCall } from "@usedapp/core";
+import { useCall, useContractFunction } from "@usedapp/core";
 
-export default function ColorNFT({ tokenId, colorNFTContract }) {
+export default function ColorNFT({ tokenId, colorNFTContract, colorModifiersContract, address }) {
   function intRgbToHex(intRgb) {
     const _r = Math.floor(intRgb / 256 ** 2);
     const _g = Math.floor((intRgb - _r * 256 ** 2) / 256);
@@ -27,6 +27,14 @@ export default function ColorNFT({ tokenId, colorNFTContract }) {
 
   const color = useTokenToColor(colorNFTContract, tokenId);
 
+  const { send: safeTransferFromSend } = useContractFunction(colorModifiersContract, "safeTransferFrom");
+
+  function addPaint(id, paintId) {
+    const byteNumber = "0x" + ("0".repeat(64) + id.slice(2)).slice(-64) + "";
+    console.log(address, colorNFTContract.address, paintId, 1, byteNumber);
+    safeTransferFromSend(address, colorNFTContract.address, paintId, 1, byteNumber);
+  }
+
   return color ? (
     <div
       style={{
@@ -39,9 +47,19 @@ export default function ColorNFT({ tokenId, colorNFTContract }) {
         background: `#${color}`,
       }}
     >
-      This is your color NFT!<br />
-      Index: {tokenId}<br />
+      This is your color NFT!
+      <br />
+      Index: {tokenId}
+      <br />
       Color: #{color}
+      <div
+        style={{
+          color: "black",
+        }}
+      >
+        <button onClick={() => addPaint(tokenId, 0)}>Darker</button>
+        <button onClick={() => addPaint(tokenId, 1)}>Lighter</button>
+      </div>
     </div>
   ) : (
     "Loading NFT..."

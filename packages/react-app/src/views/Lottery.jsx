@@ -165,7 +165,11 @@ export default function Lottery({
           </div>
 
           {/* get minted NFTS */}
-          <ColorNFTList address={address} colorNFTContract={colorNFTContract} />
+          <ColorNFTList
+            address={address}
+            colorNFTContract={colorNFTContract}
+            colorModifiersContract={colorModifiersContract}
+          />
         </div>
       </section>
 
