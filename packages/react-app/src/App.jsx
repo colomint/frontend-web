@@ -30,6 +30,8 @@ import { useStaticJsonRPC } from "./hooks";
 import { useEthers, useContractFunction, DAppProvider, Rinkeby } from "@usedapp/core"
 import { constants, utils } from "ethers"
 
+console.log(Provider)
+
 
 ////
 
