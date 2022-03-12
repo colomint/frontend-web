@@ -193,8 +193,9 @@ function App(props) {
   const ColorsNFTInterface = new utils.Interface(ColorsNFTABI);
   let colorNFTContract
   if (colorsNFTAddress) {
-    colorNFTContract = new ContractEthers(colorsNFTAddress, ColorsNFTInterface, userSigner)
+    colorNFTContract = new ContractEthers(colorsNFTAddress, ColorsNFTInterface, userSigner);
   }
+  console.log("colorNFTContract", colorNFTContract);
 
   const jackPotBalance = useContractReader(readContracts, "Jackpot", "getBalance")
 
@@ -346,7 +347,8 @@ function App(props) {
           colorModifiersContract={colorModifiersContract}
           colorModifiersAddress={colorModifiersAddress}
           colorNFTContract={colorNFTContract}
-          colorsNFTAddress={colorsNFTAddress} />
+          colorsNFTAddress={colorsNFTAddress}
+        />
       }
 
 

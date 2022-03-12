@@ -3,9 +3,10 @@ import React, { useState } from "react";
 // import { utils } from "ethers";
 // import { SyncOutlined } from "@ant-design/icons";
 
-import { Account, Address, Balance, TokenBalance } from "../components";
+import { Account, Address, Balance, ColorNFTList, TokenBalance } from "../components";
 import { useContractFunction, useCall } from "@usedapp/core";
 import { ethers } from "ethers";
+
 export default function Lottery({
   address,
   mainnetProvider,
@@ -163,19 +164,8 @@ export default function Lottery({
             </Button>
           </div>
 
-
-
           {/* get minted NFTS */}
-
-          {/* <div style={{ color: "white",  width: "200px", height: "140px", borderRadius: "8px", margin: "5px 0", padding: "12px", background: "red"}}>
-              NFT 1
-          </div>
-
-          <div style={{color: "white", width: "200px", height: "140px", borderRadius: "8px", margin: "5px 0", padding: "12px", background: "green"}}>
-              NFT 2
-          </div> */}
-
-
+          <ColorNFTList address={address} colorNFTContract={colorNFTContract} />
         </div>
       </section>
 
