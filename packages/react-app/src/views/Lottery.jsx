@@ -28,6 +28,47 @@ export default function Lottery({
 }) {
   //   const [newPurpose, setNewPurpose] = useState("loading...");
 
+
+
+  const { send: mintERC721Send } = useContractFunction(colorNFTContract, "mint")
+  const { send: mintERC1155Send } = useContractFunction(colorModifiersContract, "mint", userSigner)
+
+  // FOR using paint to modify nft colors
+  const { send: safeTransferFromSend } = useContractFunction(colorModifiersContract, "safeTransferFrom", userSigner)
+
+
+  function useTotalWhitePaint() {
+    const { value, error } = useCall(colorModifiersAddress && {
+      contract: colorModifiersContract,
+      method: 'getBalanceWhitePaint',
+      args: [address],
+    }) ?? {}
+    if (error) {
+      console.error(error.message)
+      return undefined
+    }
+    return value?.[0]
+  }
+
+  function useTotalDarkPaint() {
+    const { value, error } = useCall(colorModifiersAddress && {
+      contract: colorModifiersContract,
+      method: 'getBalanceWhitePaint',
+      args: [address],
+    }) ?? {}
+    if (error) {
+      console.error(error.message)
+      return undefined
+    }
+    return value?.[0]
+  }
+
+
+  const TotalWhitePaintInt = parseInt(useTotalWhitePaint()?._hex, 16)
+
+  const TotalDarkPaintInt = parseInt(useTotalDarkPaint()?._hex, 16)
+
+
   const [showModal, setShowModal] = useState(false);
 
   const modalHandle = () => {
@@ -38,11 +79,11 @@ export default function Lottery({
     setShowModal(false);
   };
 
-  const { send: mintERC721Send } = useContractFunction(colorNFTContract, "mint")
-
+  function getPaint() {
+    return mintERC1155Send();
+  }
 
   function mintERC721() {
-    console.log("test");
     let valueInEther = ethers.utils.parseEther("" + 0.001);
     return mintERC721Send({ value: valueInEther });
   }
@@ -93,13 +134,11 @@ export default function Lottery({
           <div style={{ border: "1px solid grey", borderRadius: "10px", marginTop: "15px", padding: "12px", background: "#1918185c" }}>
             <h2>Connected Wallet: {address && <Address address={address} ensProvider={mainnetProvider} />} </h2>
             {/* <h2>MATIC Balance: <Balance address={address} provider={localProvider} price={price} /> </h2> */}
-            <h2>MATIC Balance: <TokenBalance /> </h2>
-            {/* get colomint balance */}
-            <h2>ColoMint Balance:  </h2>
+
             {/* paint bought */}
-            <h2>Black Paint:  </h2>
+            <h2>Black Paint:{TotalDarkPaintInt}  </h2>
             {/* paint bought */}
-            <h2>White Paint:  </h2>
+            <h2>White Paint: {TotalWhitePaintInt} </h2>
 
             <Button onClick={modalHandle} style={{ width: "auto", backgroundColor: "#95a8cc", fontSize: "20px", height: "auto", boxShadow: "2px 4px" }}>
               Play the game of painting your NFT
@@ -118,6 +157,9 @@ export default function Lottery({
             {/* trigger minting */}
             <Button style={{ width: "134px", backgroundColor: "#85cc85", fontSize: "20px", height: "auto", boxShadow: "2px 4px #3a553a9c", color: "black" }} onClick={mintERC721}>
               Mint
+            </Button>
+            <Button style={{ width: "134px", backgroundColor: "#85cc85", fontSize: "20px", height: "auto", boxShadow: "2px 4px #3a553a9c", color: "black" }} onClick={getPaint}>
+              Get paint
             </Button>
           </div>
 
