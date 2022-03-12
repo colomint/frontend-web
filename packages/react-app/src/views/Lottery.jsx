@@ -87,7 +87,7 @@ const modalHandle = () => {
 
           <div style={{width: "300px", marginTop: "10px"}}>
 
-          <img width="100%" height="200px" marginTop="10px" marginBottom="10px" src="" alt="" />
+          <img width="100%" height="400px" marginTop="10px" marginBottom="10px" src="Frame 1.png" alt="ColoMint" />
 
           <div style={{backgroundColor: "#bd99dc", marginTop: "16px", border: "1px solid #bd99dc", padding: "16px", borderRadius: "4px"}}>
               {/* placeholder cost */}
